@@ -56,10 +56,10 @@ No app install. No sign-up. Just open it and watch the ISS fly over you in real 
 > *App running live at [barizshah.github.io/zarya](https://barizshah.github.io/zarya)*
 
 ### Desktop — Telemetry Dashboard
-![Zarya Desktop View](https://raw.githubusercontent.com/barizsh/zarya/main/screenshots/desktop.png)
+![Zarya Desktop View](screenshots/desktop.png)
 
 ### Mobile — Live Feeds & Tracker
-![Zarya Mobile View](https://raw.githubusercontent.com/barizsh/zarya/main/screenshots/mobile.png)
+![Zarya Mobile View](screenshots/mobile.png)
 
 ---
 
