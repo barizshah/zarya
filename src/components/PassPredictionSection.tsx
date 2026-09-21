@@ -267,7 +267,7 @@ export const PassPredictionSection: React.FC = () => {
       {displayedPasses.length > 0 && (
         <div className="content-cards-grid">
         {displayedPasses.map((pass, idx) => {
-          const isVisible = pass.visibilityType.includes('Visible');
+          const isVisible = pass.isNakedEyeVisible ?? pass.visibilityType.includes('Visible');
           const magColor = getMagColor(pass.magnitude);
           return (
             <div key={idx} className="info-card">
@@ -281,8 +281,8 @@ export const PassPredictionSection: React.FC = () => {
                     {isVisible ? '★ NAKED EYE' : pass.visibilityType === 'Daylight' ? 'DAYLIGHT PASS' : 'NIGHT SHADOW'}
                   </div>
                 </div>
-                {/* Magnitude badge */}
-                {pass.magnitude !== undefined && pass.magnitude < 90 && (
+                {/* Magnitude badge - only show for visible passes */}
+                {isVisible && pass.magnitude !== undefined && pass.magnitude < 90 && (
                   <div style={{
                     display: 'flex', flexDirection: 'column', alignItems: 'center',
                     padding: '4px 8px', borderRadius: '8px', background: '#212121',
@@ -319,9 +319,11 @@ export const PassPredictionSection: React.FC = () => {
               </div>
 
               <div className="info-card-description" style={{ marginTop: '10px', paddingTop: '8px', borderTop: 'rgba(255,255,255,0.04) 1px solid' }}>
-                {pass.maxElevation >= 40
-                  ? '⭐ High overhead — exceptionally bright and easy to spot.'
-                  : 'Horizon pass — ensure unobstructed viewing angle.'}
+                {isVisible
+                  ? (pass.maxElevation >= 40
+                    ? '⭐ High overhead — exceptionally bright and easy to spot.'
+                    : 'Horizon pass — ensure unobstructed viewing angle.')
+                  : 'Not visible'}
               </div>
             </div>
           );

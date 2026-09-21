@@ -143,18 +143,40 @@ export function getWaterBodyName(lat: number, lon: number): string {
   if (lat >= -56 && lat < 15 && lon >= -82 && lon <= -34) return 'South American Continent';
   if (lat >= -45 && lat <= -10 && lon >= 112 && lon <= 154) return 'Australian Continent';
 
-  // Major Seas
+  // Detailed Seas, Gulfs, Straits, and Bays
   if (lat >= 10 && lat <= 25 && lon >= -85 && lon <= -60) return 'Caribbean Sea';
   if (lat >= 18 && lat <= 30 && lon >= -98 && lon <= -80) return 'Gulf of Mexico';
+  if (lat >= 24 && lat <= 35 && lon >= -75 && lon <= -55) return 'Sargasso Sea';
   if (lat >= 50 && lat <= 66 && lon >= -180 && lon <= -160) return 'Bering Sea';
   if (lat >= 20 && lat <= 32 && lon >= 48 && lon <= 57) return 'Persian Gulf';
+  if (lat >= 22 && lat <= 26 && lon >= 56 && lon <= 60) return 'Gulf of Oman';
+  if (lat >= 10 && lat <= 15 && lon >= 43 && lon <= 52) return 'Gulf of Aden';
   if (lat >= 54 && lat <= 66 && lon >= 10 && lon <= 30) return 'Baltic Sea';
   if (lat >= 51 && lat <= 62 && lon >= -4 && lon <= 9) return 'North Sea';
+  if (lat >= 48 && lat <= 52 && lon >= -6 && lon <= 2) return 'English Channel';
+  if (lat >= 43 && lat <= 48 && lon >= -10 && lon <= -1) return 'Bay of Biscay';
+  if (lat >= 60 && lat <= 72 && lon >= -5 && lon <= 15) return 'Norwegian Sea';
+  if (lat >= 68 && lat <= 78 && lon >= 20 && lon <= 55) return 'Barents Sea';
+  if (lat >= 40 && lat <= 47 && lon >= 27 && lon <= 42) return 'Black Sea';
+  if (lat >= 36 && lat <= 47 && lon >= 46 && lon <= 54) return 'Caspian Sea';
   if (lat >= 0 && lat <= 25 && lon >= 100 && lon <= 125) return 'South China Sea';
+  if (lat >= 24 && lat <= 40 && lon >= 118 && lon <= 130) return 'East China Sea / Yellow Sea';
+  if (lat >= 33 && lat <= 46 && lon >= 128 && lon <= 142) return 'Sea of Japan (East Sea)';
+  if (lat >= 44 && lat <= 60 && lon >= 135 && lon <= 160) return 'Sea of Okhotsk';
+  if (lat >= 5 && lat <= 26 && lon >= 125 && lon <= 145) return 'Philippine Sea';
   if (lat >= 0 && lat <= 25 && lon >= 50 && lon <= 78) return 'Arabian Sea';
   if (lat >= 5 && lat <= 22 && lon >= 80 && lon <= 95) return 'Bay of Bengal';
+  if (lat >= -12 && lat <= 0 && lon >= 98 && lon <= 120) return 'Java Sea / Indonesian Archipelago';
   if (lat >= -25 && lat <= -10 && lon >= 142 && lon <= 170) return 'Coral Sea';
   if (lat >= -45 && lat <= -25 && lon >= 150 && lon <= 175) return 'Tasman Sea';
+  if (lat >= -15 && lat <= -8 && lon >= 125 && lon <= 135) return 'Timor Sea';
+  if (lat >= -20 && lat <= -10 && lon >= 135 && lon <= 142) return 'Gulf of Carpentaria';
+  if (lat >= -40 && lat <= -30 && lon >= 115 && lon <= 138) return 'Great Australian Bight';
+  if (lat >= 51 && lat <= 64 && lon >= -95 && lon <= -75) return 'Hudson Bay';
+  if (lat >= 50 && lat <= 65 && lon >= -65 && lon <= -45) return 'Labrador Sea';
+  if (lat >= -26 && lat <= -10 && lon >= 38 && lon <= 48) return 'Mozambique Channel';
+  if (lat >= 30 && lat <= 45 && lon >= 12 && lon <= 20) return 'Adriatic Sea';
+  if (lat >= 35 && lat <= 42 && lon >= 23 && lon <= 28) return 'Aegean Sea';
 
   // Oceans
   if (lat > 66) return 'Arctic Ocean';
@@ -462,6 +484,8 @@ export function calculateUpcomingPasses(lat: number, lon: number): import('../ty
     const visibilityType: import('../types/iss').ISSPass['visibilityType'] =
       isTwilight ? 'Visible (Clear Twilight)' : (hours >= 8 && hours <= 18 ? 'Daylight' : 'Deep Night Shadow');
 
+    const isNakedEyeVisible = isTwilight;
+
     const { magnitude, brightnessLabel } = getMagnitude(maxElevation, visibilityType);
 
     passes.push({
@@ -471,10 +495,63 @@ export function calculateUpcomingPasses(lat: number, lon: number): import('../ty
       startAzimuth: dir.start,
       endAzimuth: dir.end,
       visibilityType,
-      magnitude,
-      brightnessLabel,
+      isNakedEyeVisible,
+      magnitude: isNakedEyeVisible ? magnitude : undefined,
+      brightnessLabel: isNakedEyeVisible ? brightnessLabel : 'Not Visible',
     });
   }
 
   return passes;
 }
+
+/**
+ * WMO Weather interpretation codes (WW)
+ */
+function getWeatherCondition(code: number): string {
+  if (code === 0) return 'Clear Sky';
+  if (code === 1) return 'Mainly Clear';
+  if (code === 2) return 'Partly Cloudy';
+  if (code === 3) return 'Overcast';
+  if (code >= 45 && code <= 48) return 'Fog / Haze';
+  if (code >= 51 && code <= 55) return 'Drizzle';
+  if (code >= 61 && code <= 65) return 'Rain';
+  if (code >= 71 && code <= 77) return 'Snow';
+  if (code >= 80 && code <= 82) return 'Rain Showers';
+  if (code >= 95 && code <= 99) return 'Thunderstorm';
+  return 'Fair';
+}
+
+/**
+ * Fetch surface weather at ISS sub-satellite coordinates
+ * Uses Open-Meteo free API (no key required, fast response)
+ */
+export async function fetchISSWeather(lat: number, lon: number): Promise<import('../types/iss').ISSWeather | null> {
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 3500);
+
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat.toFixed(2)}&longitude=${lon.toFixed(2)}&current=temperature_2m,weather_code,cloud_cover,wind_speed_10m`;
+    const res = await fetch(url, {
+      signal: controller.signal,
+      headers: { 'Accept': 'application/json' },
+    });
+    clearTimeout(timeoutId);
+
+    if (res.ok) {
+      const data = await res.json();
+      if (data.current) {
+        return {
+          temperature: Math.round(data.current.temperature_2m),
+          weatherCode: data.current.weather_code ?? 0,
+          conditionText: getWeatherCondition(data.current.weather_code ?? 0),
+          cloudCover: Math.round(data.current.cloud_cover ?? 0),
+          windSpeed: Math.round(data.current.wind_speed_10m ?? 0),
+        };
+      }
+    }
+  } catch {
+    // Gracefully handle network timeouts or ocean areas without readings
+  }
+  return null;
+}
+

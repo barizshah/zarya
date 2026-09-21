@@ -3,7 +3,6 @@ import type { CameraId } from './IssNavbar';
 
 interface IssVideoPlayerProps {
   activeCamera: CameraId;
-  onSelectCamera: (cam: CameraId) => void;
 }
 
 interface CameraMetadata {

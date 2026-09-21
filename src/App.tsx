@@ -70,7 +70,6 @@ export const App: React.FC = () => {
               <section className="video-section">
                 <IssVideoPlayer
                   activeCamera={activeCamera}
-                  onSelectCamera={setActiveCamera}
                 />
               </section>
             </div>
