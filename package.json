@@ -3,14 +3,14 @@
   "description": "Real-time ISS telemetry console & live video dashboard — tracks humanity's orbital outpost at 27,580 km/h",
   "version": "2.0.0",
   "private": false,
-  "homepage": "https://barizsh.github.io/zarya",
+  "homepage": "https://barizshah.github.io/zarya",
   "repository": {
     "type": "git",
-    "url": "https://github.com/barizsh/zarya"
+    "url": "https://github.com/barizshah/zarya"
   },
   "author": {
-    "name": "barizsh",
-    "url": "https://github.com/barizsh"
+    "name": "barizshah",
+    "url": "https://github.com/barizshah"
   },
   "license": "MIT",
   "keywords": [

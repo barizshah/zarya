@@ -3,7 +3,7 @@ name: 🐛 Bug Report
 about: Report something that is broken or not working as expected
 title: "[BUG] "
 labels: bug
-assignees: barizsh
+assignees: barizshah
 ---
 
 ## 🐛 Describe the bug
