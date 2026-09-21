@@ -1,0 +1,55 @@
+{
+  "name": "zarya",
+  "description": "Real-time ISS telemetry console & live video dashboard — tracks humanity's orbital outpost at 27,580 km/h",
+  "version": "2.0.0",
+  "private": false,
+  "homepage": "https://barizsh.github.io/zarya",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/barizsh/zarya"
+  },
+  "author": {
+    "name": "barizsh",
+    "url": "https://github.com/barizsh"
+  },
+  "license": "MIT",
+  "keywords": [
+    "iss",
+    "international-space-station",
+    "nasa",
+    "space",
+    "telemetry",
+    "react",
+    "typescript",
+    "live-tracker",
+    "orbit",
+    "vite",
+    "tailwindcss",
+    "esa"
+  ],
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "lint": "oxlint",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@tailwindcss/vite": "^4.3.3",
+    "@types/leaflet": "^1.9.22",
+    "leaflet": "^1.9.4",
+    "lucide-react": "^1.47.0",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "tailwindcss": "^4.3.3"
+  },
+  "devDependencies": {
+    "@types/node": "^24.13.3",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.7",
+    "@vitejs/plugin-react": "^6.1.1",
+    "oxlint": "^1.81.0",
+    "typescript": "~6.0.2",
+    "vite": "^8.3.0"
+  }
+}
