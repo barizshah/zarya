@@ -3,7 +3,7 @@ name: 💡 Feature Request
 about: Suggest an idea or improvement for Zarya
 title: "[FEAT] "
 labels: enhancement
-assignees: barizsh
+assignees: barizshah
 ---
 
 ## 💡 Feature Summary

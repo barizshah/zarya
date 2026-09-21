@@ -87,7 +87,7 @@ export const AboutModal: React.FC<AboutModalProps> = ({ isOpen, onClose }) => {
 
           {/* Creator Attribution */}
           <a
-            href="https://github.com/barizsh"
+            href="https://github.com/barizshah"
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-3 px-3.5 py-3 rounded-xl bg-[#212121] border border-white/[0.08] hover:border-[#76FF03]/40 hover:bg-[#252525] transition-all duration-200 group no-underline"
@@ -106,7 +106,7 @@ export const AboutModal: React.FC<AboutModalProps> = ({ isOpen, onClose }) => {
             <div className="flex flex-col gap-0.5 min-w-0">
               <span className="text-[10px] text-[#666] font-mono uppercase tracking-widest">Built by</span>
               <span className="text-xs text-white font-mono font-medium group-hover:text-[#76FF03] transition-colors duration-200">
-                @barizsh
+                @barizshah
               </span>
             </div>
             <span className="ml-auto text-[#555] group-hover:text-[#76FF03] transition-colors duration-200 text-sm">↗</span>

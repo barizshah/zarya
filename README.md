@@ -16,11 +16,11 @@
 </p>
 
 <p>
-  <a href="https://barizsh.github.io/zarya"><strong>🚀 Live Demo</strong></a>
+  <a href="https://barizshah.github.io/zarya"><strong>🚀 Live Demo</strong></a>
   &nbsp;·&nbsp;
-  <a href="https://github.com/barizsh/zarya/issues">Report Bug</a>
+  <a href="https://github.com/barizshah/zarya/issues">Report Bug</a>
   &nbsp;·&nbsp;
-  <a href="https://github.com/barizsh/zarya/issues">Request Feature</a>
+  <a href="https://github.com/barizshah/zarya/issues">Request Feature</a>
 </p>
 
 </div>
@@ -53,7 +53,7 @@ No app install. No sign-up. Just open it and watch the ISS fly over you in real 
 
 ## 📸 Screenshots
 
-> *App running live at [barizsh.github.io/zarya](https://barizsh.github.io/zarya)*
+> *App running live at [barizshah.github.io/zarya](https://barizshah.github.io/zarya)*
 
 ### Desktop — Telemetry Dashboard
 ![Zarya Desktop View](https://raw.githubusercontent.com/barizsh/zarya/main/screenshots/desktop.png)
@@ -90,7 +90,7 @@ No app install. No sign-up. Just open it and watch the ISS fly over you in real 
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/barizsh/zarya.git
+git clone https://github.com/barizshah/zarya.git
 cd zarya
 
 # 2. Install dependencies
@@ -123,7 +123,7 @@ npm run build
 # Output is in dist/ — deploy to any static host
 ```
 
-**Live URL:** [https://barizsh.github.io/zarya](https://barizsh.github.io/zarya)
+**Live URL:** [https://barizshah.github.io/zarya](https://barizshah.github.io/zarya)
 
 ---
 
@@ -168,7 +168,7 @@ MIT License — see [LICENSE](LICENSE) for details.
 
 <div align="center">
 
-Built by <a href="https://github.com/barizsh">@barizsh</a> · Powered by open data from NASA, ESA, and the space community
+Built by <a href="https://github.com/barizshah">@barizshah</a> · Powered by open data from NASA, ESA, and the space community
 
 <sub>⭐ Star this repo if you find it useful!</sub>
 

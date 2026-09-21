@@ -303,7 +303,7 @@ export async function searchLocation(query: string): Promise<NominatimResult[]> 
     const res = await fetch(url, {
       headers: {
         'Accept': 'application/json',
-        'User-Agent': 'Zarya ISS Tracker (https://github.com/barizsh/zarya)',
+        'User-Agent': 'Zarya ISS Tracker (https://github.com/barizshah/zarya)',
       },
     });
     if (res.ok) {
