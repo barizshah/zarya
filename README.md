@@ -12,7 +12,7 @@
   <img src="https://img.shields.io/badge/Vite-8-646cff?style=flat-square&logo=vite&logoColor=white" alt="Vite 8" />
   <img src="https://img.shields.io/badge/Tailwind-4-38bdf8?style=flat-square&logo=tailwindcss&logoColor=white" alt="Tailwind 4" />
   <img src="https://img.shields.io/badge/License-MIT-76FF03?style=flat-square" alt="MIT License" />
-  <img src="https://img.shields.io/github/deployments/barizsh/zarya/github-pages?style=flat-square&label=Pages&color=76FF03" alt="GitHub Pages" />
+  <img src="https://img.shields.io/github/deployments/barizshah/zarya/github-pages?style=flat-square&label=Pages&color=76FF03" alt="GitHub Pages" />
 </p>
 
 <p>
