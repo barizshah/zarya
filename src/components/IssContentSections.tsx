@@ -1,7 +1,8 @@
-import React, { useMemo } from 'react';
-import type { ISSPosition, Astronaut } from '../types/iss';
+import React, { useMemo, useState, useEffect } from 'react';
+import type { ISSPosition, Astronaut, ISSWeather } from '../types/iss';
 import type { CameraId } from './IssNavbar';
 import { getFactForLocation } from '../data/spaceData';
+import { fetchISSWeather } from '../services/issApi';
 import { PassPredictionSection } from './PassPredictionSection';
 import { LaunchesSection } from './LaunchesSection';
 import { LaunchSitesSection } from './LaunchSitesSection';
@@ -26,6 +27,21 @@ export const IssContentSections: React.FC<IssContentSectionsProps> = ({
   onSelectSection,
   onOpenCrewModal,
 }) => {
+  const [weather, setWeather] = useState<ISSWeather | null>(null);
+
+  useEffect(() => {
+    if (!telemetry) return;
+    let isCurrent = true;
+    fetchISSWeather(telemetry.latitude, telemetry.longitude).then((res) => {
+      if (isCurrent && res) {
+        setWeather(res);
+      }
+    });
+    return () => {
+      isCurrent = false;
+    };
+  }, [telemetry?.latitude, telemetry?.longitude]);
+
   const speedDisplay = telemetry ? Math.round(telemetry.velocity).toLocaleString() : '27,600';
   const altDisplay = telemetry ? `${Math.round(telemetry.altitude)} km` : '408 km';
   const locationText = telemetry?.locationName || 'International Airspace / Open Ocean';
@@ -289,22 +305,60 @@ export const IssContentSections: React.FC<IssContentSectionsProps> = ({
             </div>
           </div>
 
-          {/* Desktop ISS Location Card */}
+          {/* Desktop ISS Location Card with Live Surface Weather */}
           <div className="info-card iss-fact-desktop-card" id="issLocationDesktop">
-            <div className="info-card-header">
-              <div className="info-card-icon">
-                <span className="material-icons">place</span>
+            <div className="info-card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <div className="info-card-icon">
+                  <span className="material-icons">place</span>
+                </div>
+                <div className="info-card-title">ISS Location</div>
               </div>
-              <div className="info-card-title">ISS Location</div>
+
+              {/* Surface Weather Pill */}
+              {weather && (
+                <div
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    padding: '3px 8px',
+                    borderRadius: '6px',
+                    background: 'rgba(255,255,255,0.06)',
+                    border: '1px solid rgba(255,255,255,0.08)',
+                    fontFamily: 'JetBrains Mono, monospace',
+                    fontSize: '11px',
+                    color: '#e0e0e0',
+                  }}
+                  title={`Surface weather at ISS subpoint: ${weather.conditionText}, Cloud cover: ${weather.cloudCover}%, Wind: ${weather.windSpeed} km/h`}
+                >
+                  <span className="material-icons" style={{ fontSize: '13px', color: '#76FF03' }}>
+                    {weather.conditionText.includes('Rain') || weather.conditionText.includes('Drizzle')
+                      ? 'water_drop'
+                      : weather.conditionText.includes('Cloud') || weather.cloudCover > 40
+                      ? 'cloud'
+                      : 'wb_sunny'}
+                  </span>
+                  <span>{weather.temperature > 0 ? `+${weather.temperature}` : weather.temperature}°C</span>
+                  <span style={{ color: '#888', fontSize: '10px' }}>({weather.cloudCover}% clouds)</span>
+                </div>
+              )}
             </div>
             <div className="info-card-content" id="issLocationContentDesktop">
               <div className="info-card-value" style={{ fontSize: '16px' }}>
                 {locationText}
               </div>
-              <div className="info-card-label">
-                {telemetry ? `${telemetry.latitude.toFixed(2)}° Lat  ${telemetry.longitude.toFixed(2)}° Lon` : 'Acquiring GPS...'}
+              <div className="info-card-label" style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                <span>{telemetry ? `${telemetry.latitude.toFixed(2)}° Lat  ${telemetry.longitude.toFixed(2)}° Lon` : 'Acquiring GPS...'}</span>
+                {weather && (
+                  <span style={{ color: '#76FF03', fontSize: '11px' }}>
+                    • Surface: {weather.conditionText}
+                  </span>
+                )}
               </div>
-              <div className="info-card-description">Current orbital position over Earth</div>
+              <div className="info-card-description">
+                Sub-satellite coordinates & ground surface weather
+              </div>
             </div>
           </div>
         </div>

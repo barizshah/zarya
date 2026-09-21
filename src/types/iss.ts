@@ -64,8 +64,17 @@ export interface ISSPass {
   startAzimuth: string; // e.g. "SW"
   endAzimuth: string; // e.g. "NE"
   visibilityType: 'Visible (Clear Twilight)' | 'Daylight' | 'Deep Night Shadow';
+  isNakedEyeVisible: boolean;
   magnitude?: number; // apparent magnitude (lower = brighter, -6 to +3 typical for ISS)
   brightnessLabel?: string; // e.g. "Brilliant", "Bright", "Faint"
+}
+
+export interface ISSWeather {
+  temperature: number; // in °C
+  weatherCode: number;
+  conditionText: string;
+  cloudCover: number; // %
+  windSpeed: number; // km/h
 }
 
 export interface NominatimResult {
@@ -74,3 +83,4 @@ export interface NominatimResult {
   display_name: string;
   type: string;
 }
+

@@ -5864,5 +5864,52 @@
             .map-type-icon .material-icons {
                 font-size: var(--font-md);
             }
+
+            /* Mobile video & layout optimizations */
+            .main-content {
+                margin-left: 0 !important;
+                width: 100% !important;
+            }
+
+            .content-layout {
+                padding: 10px !important;
+                gap: 14px !important;
+            }
+
+            .video-map-container {
+                flex-direction: column !important;
+                gap: 12px !important;
+            }
+
+            .video-section {
+                order: 1 !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                border-radius: 10px !important;
+                overflow: hidden !important;
+            }
+
+            .map-section {
+                order: 2 !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                border-radius: 10px !important;
+                overflow: hidden !important;
+            }
+
+            .video-section .video-player {
+                aspect-ratio: 16 / 9;
+                min-height: 220px;
+            }
+
+            .map-section .map-container {
+                aspect-ratio: 16 / 9;
+                min-height: 220px;
+            }
+
+            .stream-toggles-bar {
+                padding: 10px 12px !important;
+            }
         }
+
     

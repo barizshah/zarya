@@ -40,11 +40,12 @@ No app install. No sign-up. Just open it and watch the ISS fly over you in real 
 | Feature | Details |
 |---|---|
 | 📡 **Live Telemetry** | Altitude, velocity, lat/lon, and overhead region — refreshed every 4 seconds |
+| 🌦️ **ISS Surface Weather** | Live surface weather (temperature, cloud cover %, conditions) at ISS sub-satellite coordinates |
 | 🗺️ **ESA Orbital Tracker** | Live precision ground track via the European Space Agency's ISS tracker |
 | 📺 **Multi-feed Live Video** | Switch between Sen 4K Ultra HD, NASA HD, and NASA SD mission audio feeds |
 | 🧑‍🚀 **Crew Manifest** | Expedition 73 astronaut cards with bios, agencies, days in space |
 | 🚀 **Launch Schedule** | Upcoming orbital rocket launches from Launch Library 2 |
-| 🌍 **Pass Predictions** | ISS flyover times with elevation, direction, and brightness |
+| 🌍 **Pass Predictions** | Accurate ISS flyover times with elevation, trajectory, magnitude, and naked-eye daylight filtering |
 | 🏢 **Launch Sites** | Major spaceports and orbital launch complexes worldwide |
 | 🏛️ **Space Agencies** | NASA, ESA, Roscosmos, JAXA, CSA, ISRO, and more |
 | ❓ **FAQ** | Answers to common questions about the ISS, cameras, and space |
