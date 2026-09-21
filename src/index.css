@@ -1,0 +1,249 @@
+@import "tailwindcss";
+
+:root {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+.font-mono {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #0b0f19;
+}
+::-webkit-scrollbar-thumb {
+  background: #1e293b;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #334155;
+}
+
+/* Leaflet map tweaks */
+.leaflet-container {
+  background-color: #070a13 !important;
+  width: 100%;
+  height: 100%;
+  outline: none;
+}
+
+.leaflet-control-zoom {
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 8px !important;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5) !important;
+}
+
+.leaflet-control-zoom a {
+  background-color: rgba(15, 23, 42, 0.85) !important;
+  color: #94a3b8 !important;
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+.leaflet-control-zoom a:hover {
+  background-color: rgba(30, 41, 59, 0.95) !important;
+  color: #f8fafc !important;
+}
+
+.leaflet-control-attribution {
+  background: rgba(11, 15, 25, 0.7) !important;
+  color: #64748b !important;
+  font-size: 10px !important;
+  backdrop-filter: blur(4px);
+}
+
+.leaflet-control-attribution a {
+  color: #94a3b8 !important;
+}
+
+/* Fullscreen single-column main content without sidebar */
+.main-content {
+  margin-left: 0 !important;
+  width: 100% !important;
+  background: #0f0f0f !important;
+}
+
+/* YouTube Dark Theme with Authentic #76FF03 Telemetry Green */
+:root {
+  --bg-primary: #0f0f0f !important;
+  --bg-main: #0f0f0f !important;
+  --bg-secondary: #181818 !important;
+  --border-color: rgba(255, 255, 255, 0.1) !important;
+  --border-hover: rgba(118, 255, 3, 0.4) !important;
+  --text-primary: #ffffff !important;
+  --text-secondary: #f1f1f1 !important;
+  --text-muted: #aaaaaa !important;
+  --text-accent: #76FF03 !important;
+  --shadow-color: rgba(0, 0, 0, 0.6) !important;
+}
+
+body {
+  background: #0f0f0f !important;
+  color: #f1f1f1 !important;
+}
+
+/* Ensure map and video containers align seamlessly */
+.map-section,
+.video-section {
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: 12px !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5) !important;
+  background: #000000 !important;
+  transition: all 0.2s ease !important;
+}
+
+.map-section:hover,
+.video-section:hover {
+  border-color: rgba(118, 255, 3, 0.5) !important;
+  box-shadow: 0 6px 24px rgba(118, 255, 3, 0.15) !important;
+}
+
+.map-section .map-container,
+.video-section .video-player {
+  width: 100% !important;
+  height: 100% !important;
+  aspect-ratio: 16 / 9;
+  border-radius: 12px !important;
+}
+
+/* YouTube Studio Dark Card & Glass Styling */
+.info-card,
+.content-card,
+.iss-fact-card,
+.astronaut-card {
+  background: #181818 !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4) !important;
+  transition: all 0.2s ease !important;
+}
+
+.info-card:hover,
+.content-card:hover,
+.astronaut-card:hover {
+  transform: translateY(-2px);
+  background: #212121 !important;
+  border-color: rgba(118, 255, 3, 0.4) !important;
+  box-shadow: 0 6px 20px rgba(118, 255, 3, 0.12) !important;
+}
+
+.info-card-icon {
+  background: rgba(118, 255, 3, 0.12) !important;
+  border: 1px solid rgba(118, 255, 3, 0.3) !important;
+  color: #76FF03 !important;
+  border-radius: 8px !important;
+}
+
+.info-card-icon .material-icons {
+  color: #76FF03 !important;
+}
+
+.info-card-value {
+  font-family: 'JetBrains Mono', monospace !important;
+  letter-spacing: -0.02em !important;
+  color: #76FF03 !important;
+  text-shadow: 0 0 16px rgba(118, 255, 3, 0.35);
+}
+
+.info-card-title {
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  font-size: 14px !important;
+}
+
+.info-card-label {
+  color: #aaaaaa !important;
+  font-size: 11px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  font-family: 'JetBrains Mono', monospace !important;
+}
+
+.info-card-description {
+  color: #888888 !important;
+  font-size: 12px !important;
+}
+
+.content-section {
+  background: transparent !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+.content-section-title {
+  color: #ffffff !important;
+  font-weight: 700 !important;
+}
+
+.content-section-title .material-icons {
+  color: #76FF03 !important;
+}
+
+.content-card h3 {
+  color: #ffffff !important;
+}
+
+.content-card p {
+  color: #cccccc !important;
+  font-size: 13px !important;
+  line-height: 1.6 !important;
+}
+
+/* ── Mobile Responsive Improvements ──────────────────────────────────────── */
+
+@media (max-width: 768px) {
+  /* Tighter content padding on mobile */
+  .content-layout {
+    padding: 12px !important;
+    gap: 12px !important;
+  }
+
+  /* Stack video and map vertically on mobile */
+  .video-map-container {
+    flex-direction: column !important;
+    gap: 10px !important;
+  }
+
+  /* Full-width panels on mobile */
+  .video-section,
+  .map-section {
+    width: 100% !important;
+    max-width: 100% !important;
+    flex: 0 0 auto !important;
+  }
+
+  /* Tighter section padding on mobile */
+  .content-section {
+    padding: 16px 0 !important;
+  }
+
+  /* Hide desktop-only location card on mobile */
+  .iss-fact-desktop-card {
+    display: none !important;
+  }
+
+  /* Stream toggles bar: compact on mobile */
+  .stream-toggles-bar {
+    padding: 10px 12px !important;
+    gap: 8px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .content-layout {
+    padding: 8px !important;
+    gap: 8px !important;
+  }
+
+  /* Even tighter padding on very small phones */
+  .stream-toggles-bar {
+    padding: 8px 10px !important;
+  }
+}
