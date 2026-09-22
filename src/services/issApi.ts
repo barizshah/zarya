@@ -477,16 +477,22 @@ export function calculateUpcomingPasses(lat: number, lon: number): import('../ty
     const maxElevation = 25 + Math.round(Math.abs(Math.cos(lat + i)) * 60); // 25° to 85°
     const dir = directions[i % directions.length];
 
-    // Determine visibility type (visible at dusk/dawn when sunlit)
-    const passDate = new Date(risetime * 1000);
-    const hours = passDate.getHours();
-    const isTwilight = (hours >= 5 && hours <= 7) || (hours >= 19 && hours <= 22);
+    // Determine visibility type based on the observer's target longitude solar time:
+    // Naked eye visibility requires the observer to be in twilight/darkness while the ISS at 420km is sunlit.
+    // Local solar time = UTC time + (longitude / 15 degrees per hour).
+    const passUtc = new Date(risetime * 1000);
+    const utcHours = passUtc.getUTCHours() + passUtc.getUTCMinutes() / 60;
+    const localSolarHours = ((utcHours + (lon / 15)) % 24 + 24) % 24;
+
+    const isTwilight = (localSolarHours >= 5.0 && localSolarHours <= 6.8) || (localSolarHours >= 18.2 && localSolarHours <= 20.8);
+    const isDaylight = (localSolarHours > 6.8 && localSolarHours < 18.2);
     const visibilityType: import('../types/iss').ISSPass['visibilityType'] =
-      isTwilight ? 'Visible (Clear Twilight)' : (hours >= 8 && hours <= 18 ? 'Daylight' : 'Deep Night Shadow');
+      isTwilight ? 'Visible (Clear Twilight)' : (isDaylight ? 'Daylight' : 'Deep Night Shadow');
 
     const isNakedEyeVisible = isTwilight;
 
-    const { magnitude, brightnessLabel } = getMagnitude(maxElevation, visibilityType);
+    // Calculate apparent magnitude based on peak elevation for all passes
+    const { magnitude, brightnessLabel } = getMagnitude(maxElevation, 'Visible');
 
     passes.push({
       risetime,
@@ -496,8 +502,8 @@ export function calculateUpcomingPasses(lat: number, lon: number): import('../ty
       endAzimuth: dir.end,
       visibilityType,
       isNakedEyeVisible,
-      magnitude: isNakedEyeVisible ? magnitude : undefined,
-      brightnessLabel: isNakedEyeVisible ? brightnessLabel : 'Not Visible',
+      magnitude,
+      brightnessLabel,
     });
   }
 

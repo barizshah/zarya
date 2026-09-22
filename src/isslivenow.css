@@ -4171,7 +4171,8 @@
             }
             
             .info-section {
-                display: none;
+                display: block;
+                padding: 12px 0;
             }
             
             .video-controls {
@@ -4339,7 +4340,8 @@
             }
             
             .info-section {
-                display: none;
+                display: block;
+                padding: 10px 0;
             }
             
             .mobile-sidebar {
@@ -4398,7 +4400,7 @@
             }
             
             .info-section {
-                display: none;
+                display: block;
             }
             
             .video-controls {
@@ -5873,15 +5875,19 @@
 
             .content-layout {
                 padding: 10px !important;
-                gap: 14px !important;
+                gap: 10px !important;
             }
 
             .video-map-container {
+                display: flex !important;
                 flex-direction: column !important;
-                gap: 12px !important;
+                gap: 8px !important;
+                min-height: auto !important;
+                height: auto !important;
             }
 
-            .video-section {
+            /* 5 & 6. Mobile: Map on top (order 1), Video feed below (order 2) */
+            .map-section {
                 order: 1 !important;
                 width: 100% !important;
                 max-width: 100% !important;
@@ -5889,7 +5895,7 @@
                 overflow: hidden !important;
             }
 
-            .map-section {
+            .video-section {
                 order: 2 !important;
                 width: 100% !important;
                 max-width: 100% !important;
@@ -5897,18 +5903,226 @@
                 overflow: hidden !important;
             }
 
-            .video-section .video-player {
-                aspect-ratio: 16 / 9;
-                min-height: 220px;
-            }
-
             .map-section .map-container {
                 aspect-ratio: 16 / 9;
-                min-height: 220px;
+                min-height: 180px;
+                max-height: 240px;
+                width: 100%;
+                border-radius: 10px !important;
+            }
+
+            .video-section .video-player {
+                aspect-ratio: 16 / 9;
+                min-height: 180px;
+                max-height: 240px;
+                width: 100%;
+                border-radius: 10px !important;
             }
 
             .stream-toggles-bar {
-                padding: 10px 12px !important;
+                padding: 8px 12px !important;
+                gap: 8px !important;
+                border-radius: 10px !important;
+            }
+
+            /* Mobile Telemetry & Location Grid Layout */
+            .info-section {
+                display: block !important;
+                padding: 10px 0 !important;
+                width: 100% !important;
+            }
+
+            .info-grid {
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 12px !important;
+                width: 100% !important;
+            }
+
+            .info-cards-group {
+                display: grid !important;
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 10px !important;
+                width: 100% !important;
+            }
+
+            .info-cards-group .info-card {
+                height: auto !important;
+                min-height: 85px !important;
+                padding: 12px 10px !important;
+                display: flex !important;
+                flex-direction: column !important;
+                justify-content: center !important;
+                align-items: center !important;
+                text-align: center !important;
+                border-radius: 10px !important;
+            }
+
+            .info-cards-group .info-card .info-card-header {
+                display: flex !important;
+                align-items: center !important;
+                gap: 6px !important;
+                margin-bottom: 4px !important;
+            }
+
+            .info-cards-group .info-card .info-card-icon {
+                width: 20px !important;
+                height: 20px !important;
+                margin: 0 !important;
+            }
+
+            .info-cards-group .info-card .info-card-icon .material-icons {
+                font-size: 14px !important;
+            }
+
+            .info-cards-group .info-card .info-card-title {
+                font-size: 11px !important;
+                margin: 0 !important;
+                color: #aaaaaa !important;
+                font-weight: 600 !important;
+            }
+
+            .info-cards-group .info-card .info-card-value {
+                font-size: 18px !important;
+                font-weight: 700 !important;
+                margin: 2px 0 !important;
+                line-height: 1.1 !important;
+            }
+
+            .info-cards-group .info-card .info-card-label {
+                font-size: 10px !important;
+                color: #777777 !important;
+                margin: 0 !important;
+            }
+
+            /* ISS Location & Weather card full width below the 2x2 grid */
+            .iss-location-card,
+            .iss-fact-desktop-card {
+                width: 100% !important;
+                flex: none !important;
+                height: auto !important;
+                min-height: auto !important;
+                padding: 14px 16px !important;
+                border-radius: 10px !important;
+                display: flex !important;
+                flex-direction: column !important;
+                box-sizing: border-box !important;
+            }
+
+            /* Fix orbital overpass fact card on mobile - zero overlap */
+            .overpass-fact-card {
+                padding: 14px 16px !important;
+                gap: 12px !important;
+                height: auto !important;
+                min-height: auto !important;
+            }
+            .overpass-fact-top-row {
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                gap: 10px !important;
+                width: 100% !important;
+            }
+            .overpass-fact-header-main {
+                display: flex !important;
+                align-items: center !important;
+                gap: 10px !important;
+                width: 100% !important;
+            }
+            .overpass-fact-metric-badge {
+                margin-left: 0 !important;
+                align-self: flex-start !important;
+            }
+        }
+
+        /* Overpass Fact Card styling (Desktop & Base) */
+        .overpass-fact-card {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 18px 22px;
+            min-height: auto;
+            height: auto;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            background: var(--bg-card);
+            box-shadow: 0 4px 20px var(--shadow-color);
+        }
+
+        .overpass-fact-top-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            width: 100%;
+        }
+
+        .overpass-fact-header-main {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .overpass-fact-icon {
+            flex-shrink: 0;
+            width: 38px;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            border-radius: 8px;
+            background: rgba(118, 255, 3, 0.12);
+            color: #76FF03;
+            border: 1px solid rgba(118, 255, 3, 0.25);
+        }
+
+        .overpass-fact-title-container {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .overpass-fact-label {
+            font-size: 11px;
+            letter-spacing: 0.8px;
+            margin: 0;
+            color: #76FF03;
+            font-weight: 600;
+        }
+
+        .overpass-fact-metric-badge {
+            flex-shrink: 0;
+            font-size: 11px;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            color: #76FF03;
+            background: rgba(118, 255, 3, 0.1);
+            border: 1px solid rgba(118, 255, 3, 0.25);
+            padding: 5px 12px;
+            border-radius: 8px;
+            white-space: nowrap;
+            line-height: 1.3;
+        }
+
+        .overpass-fact-text {
+            margin: 0;
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Passes Cards Grid - Clean compact width when only 1 pass is visible */
+        .passes-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 360px));
+            gap: 16px;
+            width: 100%;
+            max-width: 1200px;
+        }
+        @media (max-width: 480px) {
+            .passes-cards-grid {
+                grid-template-columns: 1fr;
             }
         }
 

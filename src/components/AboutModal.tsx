@@ -120,7 +120,7 @@ export const AboutModal: React.FC<AboutModalProps> = ({ isOpen, onClose }) => {
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#76FF03] opacity-60" />
               <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-[#76FF03]" />
             </span>
-            <span className="text-[11px] font-mono text-[#76FF03]">v2.0 • Live</span>
+            <span className="text-[11px] font-mono text-[#76FF03]">v1.0.0 • Live</span>
           </div>
           <button
             onClick={onClose}
