@@ -7,9 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [1.0.0] — 2026-09-22
+## [1.0.0] — 2026-09-22 — Initial Official Release
 
-### ✨ Features & Capabilities
+### ✨ Initial Release Features
 - **Live 24-Hour Telemetry & UTC Time** — Real-time altitude, velocity, coordinates, overhead region, and 24-hour UTC/local time across the entire dashboard
 - **Live ISS Surface Weather** — Real-time temperature, cloud cover %, and surface weather conditions at the ISS's sub-satellite coordinates via Open-Meteo
 - **ESA Precision Orbital Tracker** — Embedded live European Space Agency orbital tracker with live trajectory and day/night terminator
