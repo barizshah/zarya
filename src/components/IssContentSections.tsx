@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { ISSPosition, Astronaut, ISSWeather } from '../types/iss';
 import type { CameraId } from './IssNavbar';
 import { getFactForLocation } from '../data/spaceData';
@@ -29,10 +29,13 @@ export const IssContentSections: React.FC<IssContentSectionsProps> = ({
 }) => {
   const [weather, setWeather] = useState<ISSWeather | null>(null);
 
+  const latitude = telemetry?.latitude;
+  const longitude = telemetry?.longitude;
+
   useEffect(() => {
-    if (!telemetry) return;
+    if (latitude === undefined || longitude === undefined) return;
     let isCurrent = true;
-    fetchISSWeather(telemetry.latitude, telemetry.longitude).then((res) => {
+    fetchISSWeather(latitude, longitude).then((res) => {
       if (isCurrent && res) {
         setWeather(res);
       }
@@ -40,7 +43,7 @@ export const IssContentSections: React.FC<IssContentSectionsProps> = ({
     return () => {
       isCurrent = false;
     };
-  }, [telemetry?.latitude, telemetry?.longitude]);
+  }, [latitude, longitude]);
 
   const speedDisplay = telemetry ? Math.round(telemetry.velocity).toLocaleString() : '27,600';
   const altDisplay = telemetry ? `${Math.round(telemetry.altitude)} km` : '408 km';
@@ -55,7 +58,7 @@ export const IssContentSections: React.FC<IssContentSectionsProps> = ({
     }
   };
 
-  const currentTimestamp = useMemo(() => Date.now(), []);
+  const [currentTimestamp] = useState(() => Date.now());
 
   return (
     <>
@@ -93,7 +96,7 @@ export const IssContentSections: React.FC<IssContentSectionsProps> = ({
             Feeds:
           </span>
 
-          {/* 1. Sen 4K Camera Toggle */}
+          {/* 1. 4K Camera Toggle */}
           <button
             onClick={() => onSelectCamera('4k')}
             className={`transition-all duration-200 rounded-lg flex items-center gap-2 px-3.5 py-2 min-h-[40px] text-xs font-medium cursor-pointer ${
@@ -103,7 +106,7 @@ export const IssContentSections: React.FC<IssContentSectionsProps> = ({
             }`}
           >
             <span className="material-icons" style={{ fontSize: '16px' }}>4k</span>
-            <span>4K Sen.com</span>
+            <span>4K Camera</span>
           </button>
 
           {/* 2. HD Camera Toggle */}
@@ -305,9 +308,9 @@ export const IssContentSections: React.FC<IssContentSectionsProps> = ({
             </div>
           </div>
 
-          {/* Desktop ISS Location Card with Live Surface Weather */}
-          <div className="info-card iss-fact-desktop-card" id="issLocationDesktop">
-            <div className="info-card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+          {/* Desktop & Mobile ISS Location Card with Live Surface Weather */}
+          <div className="info-card iss-fact-desktop-card iss-location-card" id="issLocationDesktop">
+            <div className="info-card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', flexWrap: 'wrap', gap: '8px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <div className="info-card-icon">
                   <span className="material-icons">place</span>
@@ -315,49 +318,53 @@ export const IssContentSections: React.FC<IssContentSectionsProps> = ({
                 <div className="info-card-title">ISS Location</div>
               </div>
 
-              {/* Surface Weather Pill */}
-              {weather && (
-                <div
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                    padding: '3px 8px',
-                    borderRadius: '6px',
-                    background: 'rgba(255,255,255,0.06)',
-                    border: '1px solid rgba(255,255,255,0.08)',
-                    fontFamily: 'JetBrains Mono, monospace',
-                    fontSize: '11px',
-                    color: '#e0e0e0',
-                  }}
-                  title={`Surface weather at ISS subpoint: ${weather.conditionText}, Cloud cover: ${weather.cloudCover}%, Wind: ${weather.windSpeed} km/h`}
-                >
-                  <span className="material-icons" style={{ fontSize: '13px', color: '#76FF03' }}>
-                    {weather.conditionText.includes('Rain') || weather.conditionText.includes('Drizzle')
+              {/* Surface Weather Badge - Prominent on both mobile & desktop */}
+              <div
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  padding: '4px 10px',
+                  borderRadius: '8px',
+                  background: 'rgba(118, 255, 3, 0.08)',
+                  border: '1px solid rgba(118, 255, 3, 0.25)',
+                  fontFamily: 'JetBrains Mono, monospace',
+                }}
+                title={weather ? `Surface weather at ISS subpoint: ${weather.conditionText}, Cloud cover: ${weather.cloudCover}%, Wind: ${weather.windSpeed} km/h` : 'Fetching surface meteorology at ISS coordinates...'}
+              >
+                <span className="material-icons" style={{ fontSize: '16px', color: '#76FF03' }}>
+                  {weather ? (
+                    weather.conditionText.includes('Rain') || weather.conditionText.includes('Drizzle')
                       ? 'water_drop'
                       : weather.conditionText.includes('Cloud') || weather.cloudCover > 40
                       ? 'cloud'
-                      : 'wb_sunny'}
-                  </span>
-                  <span>{weather.temperature > 0 ? `+${weather.temperature}` : weather.temperature}°C</span>
-                  <span style={{ color: '#888', fontSize: '10px' }}>({weather.cloudCover}% clouds)</span>
-                </div>
-              )}
+                      : 'wb_sunny'
+                  ) : 'sensors'}
+                </span>
+                <span style={{ fontSize: '13px', fontWeight: 700, color: '#ffffff' }}>
+                  {weather ? `${weather.temperature > 0 ? `+${weather.temperature}` : weather.temperature}°C` : '--°C'}
+                </span>
+                <span style={{ fontSize: '11px', color: '#76FF03', fontWeight: 500 }}>
+                  {weather ? weather.conditionText : 'Scanning'}
+                </span>
+              </div>
             </div>
-            <div className="info-card-content" id="issLocationContentDesktop">
-              <div className="info-card-value" style={{ fontSize: '16px' }}>
+
+            <div className="info-card-content" id="issLocationContentDesktop" style={{ marginTop: '8px' }}>
+              <div className="info-card-value" style={{ fontSize: '17px', lineHeight: 1.3, marginBottom: '6px' }}>
                 {locationText}
               </div>
-              <div className="info-card-label" style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+              <div className="info-card-label" style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap', fontSize: '12px' }}>
                 <span>{telemetry ? `${telemetry.latitude.toFixed(2)}° Lat  ${telemetry.longitude.toFixed(2)}° Lon` : 'Acquiring GPS...'}</span>
                 {weather && (
-                  <span style={{ color: '#76FF03', fontSize: '11px' }}>
-                    • Surface: {weather.conditionText}
+                  <span style={{ color: '#aaaaaa', fontSize: '11px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <span style={{ color: '#76FF03' }}>☁</span> {weather.cloudCover}% clouds
+                    {weather.windSpeed ? ` • 💨 ${Math.round(weather.windSpeed)} km/h` : ''}
                   </span>
                 )}
               </div>
-              <div className="info-card-description">
-                Sub-satellite coordinates & ground surface weather
+              <div className="info-card-description" style={{ marginTop: '4px' }}>
+                Sub-satellite ground coordinates & live surface meteorology
               </div>
             </div>
           </div>
@@ -366,28 +373,30 @@ export const IssContentSections: React.FC<IssContentSectionsProps> = ({
 
       {/* ISS Location Fact — Standalone Banner */}
       <section className="content-section" style={{ paddingTop: 0, paddingBottom: 0 }}>
-        <div className="info-card" style={{ flexDirection: 'row', alignItems: 'center', gap: '16px', padding: '16px 20px' }}>
-
-          {/* Icon — same style as .info-card-icon */}
-          <div className="info-card-icon" style={{ flexShrink: 0, width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <span className="material-icons" style={{ fontSize: '20px' }}>auto_awesome</span>
-          </div>
-
-          {/* Text */}
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div className="info-card-label" style={{ marginBottom: '5px' }}>
-              ORBITAL OVERPASS FACT — {locationFact.title.toUpperCase()}
+        <div className="info-card overpass-fact-card">
+          <div className="overpass-fact-top-row">
+            {/* Header Main: Icon + Title */}
+            <div className="overpass-fact-header-main">
+              <div className="info-card-icon overpass-fact-icon">
+                <span className="material-icons" style={{ fontSize: '20px' }}>auto_awesome</span>
+              </div>
+              <div className="overpass-fact-title-container">
+                <div className="info-card-label overpass-fact-label">
+                  ORBITAL OVERPASS FACT — {locationFact.title.toUpperCase()}
+                </div>
+              </div>
             </div>
-            <p style={{ margin: 0, fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.65 }}>
-              {locationFact.fact}
-            </p>
+
+            {/* Metric Badge */}
+            <div className="overpass-fact-metric-badge">
+              {locationFact.highlightMetric}
+            </div>
           </div>
 
-          {/* Metric — same style as .info-card-value */}
-          <div className="info-card-value" style={{ flexShrink: 0, fontSize: '13px', whiteSpace: 'nowrap' }}>
-            {locationFact.highlightMetric}
-          </div>
-
+          {/* Fact Content Text */}
+          <p className="overpass-fact-text">
+            {locationFact.fact}
+          </p>
         </div>
       </section>
 

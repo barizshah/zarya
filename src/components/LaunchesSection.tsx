@@ -49,7 +49,7 @@ export const LaunchesSection: React.FC = () => {
             const countdown = getCountdown(launch.net);
             const launchDate = new Date(launch.net).toLocaleDateString(undefined, {
               month: 'short', day: 'numeric', year: 'numeric',
-              hour: '2-digit', minute: '2-digit', timeZoneName: 'short',
+              hour: '2-digit', minute: '2-digit', hour12: false, timeZoneName: 'short',
             });
 
             return (

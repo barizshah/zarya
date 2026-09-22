@@ -34,8 +34,14 @@ export const App: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    syncPosition();
-    fetchISSCrew().then(setCrew);
+    let isCurrent = true;
+    fetchISSPosition().then((data) => {
+      if (isCurrent) setTelemetry(data);
+    }).catch((e) => console.warn('Telemetry polling fallback:', e));
+
+    fetchISSCrew().then((c) => {
+      if (isCurrent) setCrew(c);
+    });
 
     const timer = setInterval(() => {
       if (document.visibilityState === 'visible') {
@@ -43,7 +49,10 @@ export const App: React.FC = () => {
       }
     }, 4000);
 
-    return () => clearInterval(timer);
+    return () => {
+      isCurrent = false;
+      clearInterval(timer);
+    };
   }, [syncPosition]);
 
   return (

@@ -1,7 +1,7 @@
 {
   "name": "zarya",
   "description": "Real-time ISS telemetry console & live video dashboard — tracks humanity's orbital outpost at 27,580 km/h",
-  "version": "2.0.0",
+  "version": "1.0.0",
   "private": false,
   "homepage": "https://barizshah.github.io/zarya",
   "repository": {

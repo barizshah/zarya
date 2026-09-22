@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import type { CameraId } from './IssNavbar';
 import { IssBrandLogo } from './IssBrandLogo';
 
@@ -11,6 +11,21 @@ interface IssHeaderProps {
 export const IssHeader: React.FC<IssHeaderProps> = ({
   onOpenAbout,
 }) => {
+  const [systemTime, setSystemTime] = useState<string>('');
+
+  useEffect(() => {
+    const updateTime = () => {
+      const now = new Date();
+      const hours = String(now.getUTCHours()).padStart(2, '0');
+      const minutes = String(now.getUTCMinutes()).padStart(2, '0');
+      const seconds = String(now.getUTCSeconds()).padStart(2, '0');
+      setSystemTime(`${hours}:${minutes}:${seconds} UTC`);
+    };
+    updateTime();
+    const interval = setInterval(updateTime, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <header className="header iss-ad-exclude !bg-[#0f0f0f]/95 !backdrop-blur-xl !border-b !border-white/[0.08] !shadow-[0_4px_24px_rgba(0,0,0,0.6)]">
       <div className="header-left">
@@ -37,13 +52,21 @@ export const IssHeader: React.FC<IssHeaderProps> = ({
         </div>
       </div>
 
-      <div className="header-right flex items-center gap-2.5">
+      <div className="header-right flex items-center gap-2 sm:gap-2.5">
+        {/* 24-Hour Mission Station Time Clock */}
+        {systemTime && (
+          <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-white/[0.04] border border-white/[0.08] text-white text-[11px] font-mono tracking-wide">
+            <span className="material-icons" style={{ fontSize: '13px', color: '#76FF03' }}>schedule</span>
+            <span>{systemTime}</span>
+          </div>
+        )}
+
         {/* Minimal Live Orbit Status */}
-        <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#76FF03]/[0.08] border border-[#76FF03]/25 text-[#76FF03] text-[11px] font-mono font-medium tracking-wide">
+        <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#76FF03]/[0.08] border border-[#76FF03]/25 text-[#76FF03] text-[11px] font-mono font-medium tracking-wide">
           <span className="flex h-2 w-2 relative shrink-0">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#76FF03] opacity-60" />
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-[#76FF03] shadow-[0_0_8px_#76FF03]" />
-            </span>
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#76FF03] opacity-60" />
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-[#76FF03] shadow-[0_0_8px_#76FF03]" />
+          </span>
           <span>ORBIT ACTIVE</span>
         </div>
 

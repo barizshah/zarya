@@ -7,42 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [2.0.0] — 2026-09-21
+## [1.0.0] — 2026-09-22
 
-### ✨ Added
-- **Multi-feed live video player** — Switch between Sen 4K Ultra HD, NASA HD, and NASA SD/Mission Audio feeds with a single click
-- **ESA ISS Ground Track** — Embedded live precision orbital tracker from the European Space Agency
-- **Expedition 73 Crew Manifest** — Full crew cards with portraits, agencies, roles, bios, days-in-space counter, and fun facts
-- **Upcoming Rocket Launches** — Live schedule from Launch Library 2 API with fallback data
-- **Launch Sites Section** — Major global spaceports with descriptions and coordinates
-- **Global Space Agencies** — Profiles for NASA, ESA, Roscosmos, JAXA, CSA, ISRO, CNSA, and more
-- **Pass Prediction Engine** — Calculated ISS flyover times with elevation, azimuth direction, and brightness rating
-- **Orbital Overpass Facts** — Dynamic fact banner based on current ISS ground position
-- **About Modal** — App info with creator attribution, data sources, and feature overview
-- **Crew Modal** — Full-screen crew roster dialog with enriched astronaut data
-- **Stream Toggles Toolbar** — Quick-switch bar for camera feeds and section jump links
-- **GitHub Pages deployment** — Automatic CI/CD via GitHub Actions on push to `main`
+### ✨ Features & Capabilities
+- **Live 24-Hour Telemetry & UTC Time** — Real-time altitude, velocity, coordinates, overhead region, and 24-hour UTC/local time across the entire dashboard
+- **Live ISS Surface Weather** — Real-time temperature, cloud cover %, and surface weather conditions at the ISS's sub-satellite coordinates via Open-Meteo
+- **ESA Precision Orbital Tracker** — Embedded live European Space Agency orbital tracker with live trajectory and day/night terminator
+- **Multi-Feed Live Video Player** — Streamlined toggle between Sen 4K Ultra HD, NASA HD, and NASA SD with mission audio
+- **Global Pass Flyover Predictions** — Accurate flyover times with elevation, trajectory, observer daylight calculation, local timezone detection, and compact card layout
+- **Expedition 73 Crew Manifest** — Full astronaut roster with portraits, agencies, roles, bios, and days-in-space tracking
+- **Upcoming Rocket Launches** — Real-time launch schedules from Launch Library 2 with automatic fallback
+- **Space Agencies & Launch Sites** — Profiles of major global space agencies and spaceport coordinates
+- **Orbital Overpass Facts** — Dynamic educational facts contextualized to the station's current ground track
 
-### 🎨 Improved
-- Unified `animate-ping` live indicator pattern across ORBIT ACTIVE badge and Feeds label
-- 44px+ minimum touch targets on all toolbar buttons for mobile usability
-- Mobile-responsive layout: video/map stack vertically, compact padding at 768px and 480px breakpoints
-- Polished About modal: scrollable content, GitHub link card, live ping dot in footer
-- Cleaned up all unused Vite template boilerplate from `App.css`
+### 📱 Mobile & UI Improvements
+- **Zero Element Overlap** — Redesigned mobile layout for ISS Location and Surface Weather cards
+- **Clean Pass Grid Layout** — Auto-fitting grid prevents single visible pass cards from over-stretching
+- **Streamlined Camera Selector** — Simplified 4K, HD, and SD controls with 44px+ touch targets
+- **Dark Mode Telemetry Aesthetic** — Mission-control inspired dark theme with `#76FF03` telemetry green accents
 
-### 🔧 Technical
+### 🔧 Architecture
 - React 19 + TypeScript 6 + Vite 8 + Tailwind CSS 4
-- ISS telemetry: WhereTheISS.at primary, SGP cloud function fallback, mathematical orbital simulation as last resort
-- All data fetched client-side — zero backend required
-- MIT License
-
----
-
-## [1.0.0] — 2026-09-20
-
-### ✨ Added
-- Initial release with live ISS telemetry display
-- Basic video feed embedding (YouTube iframes)
-- Dark-mode-only UI with `#76FF03` telemetry green accent
-- Altitude, velocity, and crew count info cards
-- ISS location with reverse geocoding
+- Client-side zero-backend architecture with automatic fallbacks for telemetry and launch APIs
+- GitHub Pages automated CI/CD deployment

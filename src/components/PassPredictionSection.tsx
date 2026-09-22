@@ -103,7 +103,7 @@ export const PassPredictionSection: React.FC = () => {
 
   const formatPassTime = (epochSeconds: number) =>
     new Date(epochSeconds * 1000).toLocaleDateString(undefined, {
-      weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit',
+      weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false, timeZoneName: 'short',
     });
 
   const displayedPasses = visibleOnly ? passes.filter(p => p.visibilityType.includes('Visible')) : passes;
@@ -265,7 +265,7 @@ export const PassPredictionSection: React.FC = () => {
 
       {/* Passes Grid */}
       {displayedPasses.length > 0 && (
-        <div className="content-cards-grid">
+        <div className="content-cards-grid passes-cards-grid">
         {displayedPasses.map((pass, idx) => {
           const isVisible = pass.isNakedEyeVisible ?? pass.visibilityType.includes('Visible');
           const magColor = getMagColor(pass.magnitude);
@@ -277,21 +277,22 @@ export const PassPredictionSection: React.FC = () => {
                 </div>
                 <div style={{ flex: 1 }}>
                   <div className="info-card-title">Pass #{idx + 1}</div>
-                  <div style={{ marginTop: '2px', fontSize: '10px', fontFamily: 'JetBrains Mono, monospace', color: isVisible ? GREEN : '#aaaaaa' }}>
-                    {isVisible ? '★ NAKED EYE' : pass.visibilityType === 'Daylight' ? 'DAYLIGHT PASS' : 'NIGHT SHADOW'}
+                  <div style={{ marginTop: '2px', fontSize: '10px', fontFamily: 'JetBrains Mono, monospace', fontWeight: 600, color: isVisible ? GREEN : '#f87171' }}>
+                    {isVisible ? '★ NAKED EYE VISIBLE' : '✕ NOT VISIBLE'}
                   </div>
                 </div>
-                {/* Magnitude badge - only show for visible passes */}
-                {isVisible && pass.magnitude !== undefined && pass.magnitude < 90 && (
+
+                {/* Magnitude badge slot - only shown for visible passes */}
+                {isVisible && pass.magnitude !== undefined && (
                   <div style={{
                     display: 'flex', flexDirection: 'column', alignItems: 'center',
                     padding: '4px 8px', borderRadius: '8px', background: '#212121',
-                    border: `1px solid ${magColor}40`,
+                    border: `1px solid ${magColor}40`, minWidth: '54px',
                   }}>
                     <span style={{ fontSize: '14px', fontWeight: 700, fontFamily: 'JetBrains Mono, monospace', color: magColor }}>
                       {pass.magnitude > 0 ? '+' : ''}{pass.magnitude}
                     </span>
-                    <span style={{ fontSize: '9px', color: magColor, opacity: 0.8, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                    <span style={{ fontSize: '9px', color: magColor, opacity: 0.85, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                       {pass.brightnessLabel}
                     </span>
                   </div>
@@ -312,18 +313,10 @@ export const PassPredictionSection: React.FC = () => {
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                     <span className="info-card-description">Trajectory</span>
                     <span className="info-card-label" style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#ffffff' }}>
-                      {pass.startAzimuth} <Navigation style={{ width: '10px', height: '10px', color: GREEN }} /> {pass.endAzimuth}
+                      {pass.startAzimuth} <Navigation style={{ width: '10px', height: '10px', color: isVisible ? GREEN : '#aaaaaa' }} /> {pass.endAzimuth}
                     </span>
                   </div>
                 </div>
-              </div>
-
-              <div className="info-card-description" style={{ marginTop: '10px', paddingTop: '8px', borderTop: 'rgba(255,255,255,0.04) 1px solid' }}>
-                {isVisible
-                  ? (pass.maxElevation >= 40
-                    ? '⭐ High overhead — exceptionally bright and easy to spot.'
-                    : 'Horizon pass — ensure unobstructed viewing angle.')
-                  : 'Not visible'}
               </div>
             </div>
           );
