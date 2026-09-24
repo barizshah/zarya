@@ -381,7 +381,6 @@
 
 
         [data-theme="light"] .iss-marker {
-            background-image: url('img/ic_iss_icon.png');
             background-size: contain;
             background-repeat: no-repeat;
             background-position: center;
@@ -1539,8 +1538,7 @@
             border-radius: 20px;
             border: 1px solid rgba(255, 255, 255, 0.12);
             background:
-                linear-gradient(168deg, rgba(2, 6, 23, 0.78) 0%, rgba(15, 23, 42, 0.52) 38%, rgba(2, 6, 23, 0.9) 100%),
-                url('/img/artemis-launch-hero-bg.png') center 40% / cover no-repeat;
+                linear-gradient(168deg, rgba(2, 6, 23, 0.78) 0%, rgba(15, 23, 42, 0.52) 38%, rgba(2, 6, 23, 0.9) 100%);
             box-shadow:
                 0 4px 6px rgba(0, 0, 0, 0.15),
                 0 28px 56px -16px rgba(0, 0, 0, 0.6),

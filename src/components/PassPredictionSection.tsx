@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Compass, MapPin, Navigation, Clock, Search, Eye, EyeOff } from 'lucide-react';
 import type { ISSPass } from '../types/iss';
-import { calculateUpcomingPasses, searchLocation } from '../services/issApi';
+import { fetchUpcomingPasses, searchLocation } from '../services/issApi';
 import type { NominatimResult } from '../types/iss';
 
 const GREEN = '#76FF03';
@@ -13,6 +13,7 @@ export const PassPredictionSection: React.FC = () => {
   const [locationLabel, setLocationLabel] = useState<string>('');
   const [passes, setPasses] = useState<ISSPass[]>([]);
   const [isDetecting, setIsDetecting] = useState<boolean>(false);
+  const [isLoadingPasses, setIsLoadingPasses] = useState<boolean>(false);
   const [visibleOnly, setVisibleOnly] = useState<boolean>(true);
 
   // City search state
@@ -23,8 +24,14 @@ export const PassPredictionSection: React.FC = () => {
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const updatePasses = (latitude: number, longitude: number) => {
-    setPasses(calculateUpcomingPasses(latitude, longitude));
+  const updatePasses = async (latitude: number, longitude: number) => {
+    setIsLoadingPasses(true);
+    try {
+      const results = await fetchUpcomingPasses(latitude, longitude);
+      setPasses(results);
+    } finally {
+      setIsLoadingPasses(false);
+    }
   };
 
   // Debounced city search
@@ -141,7 +148,7 @@ export const PassPredictionSection: React.FC = () => {
               type="text"
               value={cityQuery}
               onChange={(e) => handleCityInput(e.target.value)}
-              placeholder="Search city, country… e.g. London, UK or Tokyo, Japan"
+              placeholder="Search any city or country… e.g. London, UK or Tokyo, Japan"
               style={{
                 flex: 1, background: 'transparent', color: '#ffffff',
                 fontFamily: 'JetBrains Mono, monospace', fontSize: '12px',
@@ -224,8 +231,15 @@ export const PassPredictionSection: React.FC = () => {
           </form>
         </div>
 
-        {/* Visible Only Toggle */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+        {/* Visible Only Toggle and Status */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
+          <div style={{ fontSize: '11px', fontFamily: 'JetBrains Mono, monospace', color: '#777' }}>
+            {isLoadingPasses ? (
+              <span style={{ color: GREEN }}>Calculating high-accuracy orbital passes…</span>
+            ) : passes.length > 0 ? (
+              <span>Found {passes.length} passes ({passes.filter(p => p.isNakedEyeVisible).length} visible)</span>
+            ) : null}
+          </div>
           <button
             onClick={() => setVisibleOnly(v => !v)}
             style={{
@@ -258,7 +272,7 @@ export const PassPredictionSection: React.FC = () => {
       {passes.length > 0 && visibleOnly && displayedPasses.length === 0 && (
         <div style={{ padding: '18px', borderRadius: '10px', background: '#181818', border: `1px solid ${BORDER}`, textAlign: 'center', marginBottom: '12px' }}>
           <span style={{ fontSize: '12px', color: '#aaaaaa', fontFamily: 'JetBrains Mono, monospace' }}>
-            No naked-eye visible passes predicted in the next 7 hours for this location. Toggle to "All Passes" to see daylight and night shadow passes.
+            No naked-eye visible passes predicted in the next 10 days for this location. Toggle to "All Passes" to inspect daylight and night shadow passes.
           </span>
         </div>
       )}
@@ -266,62 +280,118 @@ export const PassPredictionSection: React.FC = () => {
       {/* Passes Grid */}
       {displayedPasses.length > 0 && (
         <div className="content-cards-grid passes-cards-grid">
-        {displayedPasses.map((pass, idx) => {
-          const isVisible = pass.isNakedEyeVisible ?? pass.visibilityType.includes('Visible');
-          const magColor = getMagColor(pass.magnitude);
-          return (
-            <div key={idx} className="info-card">
-              <div className="info-card-header">
-                <div className="info-card-icon" style={{ width: '34px', height: '34px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <Clock style={{ width: '15px', height: '15px' }} />
-                </div>
-                <div style={{ flex: 1 }}>
-                  <div className="info-card-title">Pass #{idx + 1}</div>
-                  <div style={{ marginTop: '2px', fontSize: '10px', fontFamily: 'JetBrains Mono, monospace', fontWeight: 600, color: isVisible ? GREEN : '#f87171' }}>
-                    {isVisible ? '★ NAKED EYE VISIBLE' : '✕ NOT VISIBLE'}
+          {displayedPasses.map((pass, idx) => {
+            const isVisible = pass.isNakedEyeVisible;
+            const magColor = getMagColor(pass.magnitude);
+
+            // Subtle color themes for pass badges
+            let badgeBg = '#222222';
+            let badgeBorder = BORDER;
+            let badgeColor = '#94a3b8';
+            let badgeIcon = '✕ ';
+
+            if (pass.passTypeLabel === 'VISIBLE') {
+              badgeBg = 'rgba(118,255,3,0.1)';
+              badgeBorder = 'rgba(118,255,3,0.25)';
+              badgeColor = GREEN;
+              badgeIcon = '★ ';
+            } else if (pass.passTypeLabel === 'DAYLIGHT PASS') {
+              badgeBg = 'rgba(56,189,248,0.08)';
+              badgeBorder = 'rgba(56,189,248,0.2)';
+              badgeColor = '#38bdf8';
+              badgeIcon = '☀️ ';
+            } else if (pass.passTypeLabel === 'NIGHT (UNLIT)') {
+              badgeBg = 'rgba(148,163,184,0.08)';
+              badgeBorder = 'rgba(148,163,184,0.18)';
+              badgeColor = '#94a3b8';
+              badgeIcon = '🌑 ';
+            }
+
+            return (
+              <div key={idx} className="info-card">
+                <div className="info-card-header">
+                  <div className="info-card-icon" style={{ width: '34px', height: '34px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <Clock style={{ width: '15px', height: '15px' }} />
                   </div>
+                  <div style={{ flex: 1 }}>
+                    <div className="info-card-title">Pass #{idx + 1}</div>
+                    <div style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                      marginTop: '4px',
+                      padding: '2px 7px',
+                      borderRadius: '4px',
+                      fontSize: '9.5px',
+                      fontFamily: 'JetBrains Mono, monospace',
+                      fontWeight: 600,
+                      letterSpacing: '0.4px',
+                      background: badgeBg,
+                      border: `1px solid ${badgeBorder}`,
+                      color: badgeColor,
+                    }}>
+                      <span>{badgeIcon}</span>
+                      <span>{pass.passTypeLabel || (isVisible ? 'VISIBLE' : 'NOT VISIBLE')}</span>
+                    </div>
+                  </div>
+
+                  {/* Magnitude badge - displayed for visible passes */}
+                  {isVisible && pass.magnitude !== undefined && (
+                    <div style={{
+                      display: 'flex', flexDirection: 'column', alignItems: 'center',
+                      padding: '4px 8px', borderRadius: '8px', background: '#212121',
+                      border: `1px solid ${magColor}40`, minWidth: '58px',
+                    }}>
+                      <span style={{ fontSize: '14px', fontWeight: 700, fontFamily: 'JetBrains Mono, monospace', color: magColor }}>
+                        {pass.magnitude > 0 ? '+' : ''}{Number(pass.magnitude).toFixed(1)}
+                      </span>
+                      <span style={{ fontSize: '9px', color: magColor, opacity: 0.85, textTransform: 'uppercase', letterSpacing: '0.5px', marginTop: '2px' }}>
+                        {pass.brightnessLabel}
+                      </span>
+                    </div>
+                  )}
                 </div>
 
-                {/* Magnitude badge slot - only shown for visible passes */}
-                {isVisible && pass.magnitude !== undefined && (
-                  <div style={{
-                    display: 'flex', flexDirection: 'column', alignItems: 'center',
-                    padding: '4px 8px', borderRadius: '8px', background: '#212121',
-                    border: `1px solid ${magColor}40`, minWidth: '54px',
-                  }}>
-                    <span style={{ fontSize: '14px', fontWeight: 700, fontFamily: 'JetBrains Mono, monospace', color: magColor }}>
-                      {pass.magnitude > 0 ? '+' : ''}{pass.magnitude}
-                    </span>
-                    <span style={{ fontSize: '9px', color: magColor, opacity: 0.85, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                      {pass.brightnessLabel}
-                    </span>
+                <div className="info-card-content">
+                  <div className="info-card-value" style={{ fontSize: '13px' }}>{formatPassTime(pass.risetime)}</div>
+                  <div style={{ marginTop: '10px', paddingTop: '10px', borderTop: `1px solid ${BORDER}`, display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span className="info-card-description">Duration</span>
+                      <span className="info-card-label" style={{ color: '#ffffff' }}>{Math.floor(pass.duration / 60)}m {pass.duration % 60}s</span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span className="info-card-description">Max Elevation</span>
+                      <span className="info-card-value" style={{ fontSize: '13px', color: isVisible && pass.maxElevation >= 40 ? GREEN : '#ffffff' }}>
+                        {pass.maxElevation}°
+                      </span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span className="info-card-description">Trajectory</span>
+                      <span className="info-card-label" style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#ffffff' }}>
+                        {pass.startAzimuth} <Navigation style={{ width: '10px', height: '10px', color: isVisible ? GREEN : '#888888' }} /> {pass.endAzimuth}
+                      </span>
+                    </div>
                   </div>
-                )}
-              </div>
 
-              <div className="info-card-content">
-                <div className="info-card-value" style={{ fontSize: '13px' }}>{formatPassTime(pass.risetime)}</div>
-                <div style={{ marginTop: '10px', paddingTop: '10px', borderTop: `1px solid ${BORDER}`, display: 'flex', flexDirection: 'column', gap: '5px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <span className="info-card-description">Duration</span>
-                    <span className="info-card-label" style={{ color: '#ffffff' }}>{Math.floor(pass.duration / 60)}m {pass.duration % 60}s</span>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <span className="info-card-description">Max Elevation</span>
-                    <span className="info-card-value" style={{ fontSize: '13px' }}>{pass.maxElevation}°</span>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <span className="info-card-description">Trajectory</span>
-                    <span className="info-card-label" style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#ffffff' }}>
-                      {pass.startAzimuth} <Navigation style={{ width: '10px', height: '10px', color: isVisible ? GREEN : '#aaaaaa' }} /> {pass.endAzimuth}
-                    </span>
-                  </div>
+                  {/* Subtle context note */}
+                  {pass.subtleNote && (
+                    <div style={{
+                      marginTop: '10px',
+                      paddingTop: '8px',
+                      borderTop: 'rgba(255,255,255,0.04) 1px solid',
+                      fontSize: '11px',
+                      color: isVisible ? '#bbf7d0' : '#888888',
+                      lineHeight: '1.4',
+                      fontFamily: 'system-ui, -apple-system, sans-serif',
+                    }}>
+                      {pass.subtleNote}
+                    </div>
+                  )}
                 </div>
               </div>
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
       )}
     </section>
   );
