@@ -58,15 +58,27 @@ export interface RocketLaunch {
 }
 
 export interface ISSPass {
-  risetime: number; // Unix timestamp in seconds
+  risetime: number; // Unix timestamp in seconds (start)
   duration: number; // in seconds
   maxElevation: number; // in degrees
-  startAzimuth: string; // e.g. "SW"
-  endAzimuth: string; // e.g. "NE"
+  startAzimuth: string; // e.g. "NNW"
+  startElevation: number; // e.g. 10
+  highestAzimuth: string; // e.g. "N"
+  highestElevation: number; // e.g. 38
+  endAzimuth: string; // e.g. "ENE"
+  endElevation: number; // e.g. 10
+  highestTime: number; // Unix timestamp in seconds
+  endTime: number; // Unix timestamp in seconds
   visibilityType: 'Visible (Clear Twilight)' | 'Daylight' | 'Deep Night Shadow';
+  passTypeLabel: 'VISIBLE' | 'DAYLIGHT PASS' | 'NIGHT (UNLIT)';
   isNakedEyeVisible: boolean;
   magnitude?: number; // apparent magnitude (lower = brighter, -6 to +3 typical for ISS)
   brightnessLabel?: string; // e.g. "Brilliant", "Bright", "Faint"
+  subtleNote?: string;
+  dateLabel: string; // e.g. "Tue 22 Sep"
+  startTimeStr: string; // e.g. "20:13"
+  highestTimeStr: string; // e.g. "20:15"
+  endTimeStr: string; // e.g. "20:17"
 }
 
 export interface ISSWeather {

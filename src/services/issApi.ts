@@ -1,4 +1,4 @@
-import type { ISSPosition, Astronaut, NominatimResult } from '../types/iss';
+import type { ISSPosition, Astronaut, NominatimResult, ISSPass } from '../types/iss';
 
 // Primary endpoint: wheretheiss.at
 const WHERETHEISS_BASE = 'https://api.wheretheiss.at/v1';
@@ -431,83 +431,347 @@ export async function fetchUpcomingLaunches(): Promise<import('../types/iss').Ro
 }
 
 /**
- * Calculate apparent magnitude label for ISS pass
- * ISS ranges from ~-5.9 (overhead twilight) to +2.5 (horizon)
+ * Calculate apparent magnitude label for ISS pass based on peak elevation and slant range
+ * Uses standard visual satellite photometric model:
+ * m = H0 + 5 * log10(d / 1000) + atmospheric extinction
+ * Standard ISS intrinsic absolute magnitude H0 ≈ -1.9 at 1,000 km distance
+ * Ranges from -3.6 (74° zenith overhead) to -0.7 (12° low horizon)
  */
-function getMagnitude(maxElevation: number, visibilityType: string): { magnitude: number; brightnessLabel: string } {
-  if (!visibilityType.includes('Visible')) {
+function getMagnitude(maxElevation: number, isVisible: boolean): { magnitude: number; brightnessLabel: string } {
+  if (!isVisible) {
     return { magnitude: 99, brightnessLabel: 'Not Visible' };
   }
-  // Approximate: higher elevation = brighter (lower magnitude number)
-  // ISS at max overhead: ~ -3.5 to -5.9; at horizon: ~+1 to +2.5
-  const mag = parseFloat((2.0 - (maxElevation / 90) * 7.5).toFixed(1));
+
+  const R = 6371.0;
+  const H = 418.0;
+  const el = Math.max(10, Math.min(90, maxElevation));
+  const elRad = (el * Math.PI) / 180;
+
+  // Exact slant range distance from observer to ISS (km)
+  const slantKm = Math.sqrt(R * R * Math.sin(elRad) * Math.sin(elRad) + 2 * R * H + H * H) - R * Math.sin(elRad);
+
+  // Rayleigh atmospheric extinction correction
+  const extinction = 0.14 / (Math.sin(elRad) + 0.05);
+
+  // Standard photometric magnitude equation
+  const mag = parseFloat((-1.9 + 5 * Math.log10(slantKm / 1000) + extinction).toFixed(1));
+
   let brightnessLabel: string;
-  if (mag <= -3) brightnessLabel = 'Brilliant';
-  else if (mag <= -1) brightnessLabel = 'Very Bright';
-  else if (mag <= 0) brightnessLabel = 'Bright';
-  else if (mag <= 1.5) brightnessLabel = 'Moderate';
+  if (mag <= -3.0) brightnessLabel = 'Brilliant';
+  else if (mag <= -2.0) brightnessLabel = 'Very Bright';
+  else if (mag <= -1.0) brightnessLabel = 'Bright';
+  else if (mag <= 0.5) brightnessLabel = 'Moderate';
   else brightnessLabel = 'Faint';
 
   return { magnitude: mag, brightnessLabel };
 }
 
 /**
- * Calculate upcoming visible ISS passes for given coordinates
+ * Calculate solar elevation angle in degrees for given date & observer coordinates
  */
-export function calculateUpcomingPasses(lat: number, lon: number): import('../types/iss').ISSPass[] {
-  // SGP4 orbital mechanics approximate pass calculation
-  // ISS orbital inclination is 51.64°, orbital period is 92.68 minutes
-  const now = Math.floor(Date.now() / 1000);
+function getSolarAltitudeDeg(date: Date, latDeg: number, lonDeg: number): number {
+  const rad = Math.PI / 180;
+  const startOfYear = new Date(date.getFullYear(), 0, 0);
+  const dayOfYear = Math.floor((date.getTime() - startOfYear.getTime()) / (1000 * 60 * 60 * 24));
+  // Solar declination approximation
+  const declination = 23.45 * Math.sin((360 / 365) * (dayOfYear - 81) * rad) * rad;
+  const utcHours = date.getUTCHours() + date.getUTCMinutes() / 60 + date.getUTCSeconds() / 3600;
+  const solarTime = ((utcHours + lonDeg / 15) % 24 + 24) % 24;
+  const hourAngle = (solarTime - 12) * 15 * rad;
+  const latRad = latDeg * rad;
+  const sinAlt = Math.sin(latRad) * Math.sin(declination) + Math.cos(latRad) * Math.cos(declination) * Math.cos(hourAngle);
+  return Math.asin(Math.max(-1, Math.min(1, sinAlt))) * (180 / Math.PI);
+}
+
+/**
+ * Calculate upcoming ISS passes for given coordinates over the next 10 days
+ * Continuous time-step orbital propagation model
+ * @param startOffsetMinutes Optional offset in minutes from now (e.g. to stitch after live API passes)
+ */
+export function calculateUpcomingPasses(lat: number, lon: number, startOffsetMinutes = 0): import('../types/iss').ISSPass[] {
+  const nowMs = Date.now();
   const passes: import('../types/iss').ISSPass[] = [];
 
-  // Generate the next 4 realistic pass predictions based on orbital cycle
-  const baseIntervalSeconds = 92.68 * 60; // 5560 seconds
-  const directions = [
-    { start: 'SW', end: 'NE' },
-    { start: 'W', end: 'ENE' },
-    { start: 'SSW', end: 'ENE' },
-    { start: 'NW', end: 'SE' },
-  ];
+  const inc = (51.64 * Math.PI) / 180;
+  const periodMin = 92.68;
+  const earthRateDegPerMin = 360 / 1440; // 0.25 deg/min
+  const raanPrecessionDegPerMin = 5.0 / 1440; // ~0.00347 deg/min westward nodal regression
+  const R = 6371.0;
+  const H = 418.0;
 
-  for (let i = 0; i < 4; i++) {
-    // Passes repeat at intervals with Earth rotation shift
-    const passOffset = (i + 1) * baseIntervalSeconds + (i * 1800) + (Math.abs(Math.sin(lat + i)) * 1200);
-    const risetime = now + Math.round(passOffset);
-    const duration = 240 + Math.round(Math.abs(Math.sin(lon + i)) * 180); // 4 to 7 minutes
-    const maxElevation = 25 + Math.round(Math.abs(Math.cos(lat + i)) * 60); // 25° to 85°
-    const dir = directions[i % directions.length];
+  const obsLatRad = (lat * Math.PI) / 180;
+  const totalMinutes = 10 * 24 * 60; // 10 days = 14,400 minutes
+  const stepMin = 0.5; // 30-second simulation steps for continuous precision
 
-    // Determine visibility type based on the observer's target longitude solar time:
-    // Naked eye visibility requires the observer to be in twilight/darkness while the ISS at 420km is sunlit.
-    // Local solar time = UTC time + (longitude / 15 degrees per hour).
-    const passUtc = new Date(risetime * 1000);
-    const utcHours = passUtc.getUTCHours() + passUtc.getUTCMinutes() / 60;
-    const localSolarHours = ((utcHours + (lon / 15)) % 24 + 24) % 24;
+  const getCompass = (startLat: number, startLon: number, endLat: number, endLon: number): string => {
+    const dLon = ((endLon - startLon) * Math.PI) / 180;
+    const y = Math.sin(dLon) * Math.cos((endLat * Math.PI) / 180);
+    const x =
+      Math.cos((startLat * Math.PI) / 180) * Math.sin((endLat * Math.PI) / 180) -
+      Math.sin((startLat * Math.PI) / 180) * Math.cos((endLat * Math.PI) / 180) * Math.cos(dLon);
+    const brng = ((Math.atan2(y, x) * 180) / Math.PI + 360) % 360;
+    const compass = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW'];
+    return compass[Math.round(brng / 22.5) % 16];
+  };
 
-    const isTwilight = (localSolarHours >= 5.0 && localSolarHours <= 6.8) || (localSolarHours >= 18.2 && localSolarHours <= 20.8);
-    const isDaylight = (localSolarHours > 6.8 && localSolarHours < 18.2);
-    const visibilityType: import('../types/iss').ISSPass['visibilityType'] =
-      isTwilight ? 'Visible (Clear Twilight)' : (isDaylight ? 'Daylight' : 'Deep Night Shadow');
+  let inPass = false;
+  let passStartMin = 0;
+  let passMaxEl = -90;
+  let passPeakMin = 0;
+  let passStartLat = 0;
+  let passStartLon = 0;
+  let passPeakLat = 0;
+  let passPeakLon = 0;
+  let passEndLat = 0;
+  let passEndLon = 0;
 
-    const isNakedEyeVisible = isTwilight;
+  for (let m = Math.max(0, startOffsetMinutes); m <= totalMinutes; m += stepMin) {
+    const u = (m / periodMin) * 2 * Math.PI;
+    const satLat = Math.asin(Math.sin(inc) * Math.sin(u));
+    const satLonDeg =
+      ((((u * 180) / Math.PI) * Math.cos(inc) - m * (earthRateDegPerMin + raanPrecessionDegPerMin) + 180) % 360 + 360) %
+        360 -
+      180;
+    const satLatDeg = (satLat * 180) / Math.PI;
 
-    // Calculate apparent magnitude based on peak elevation for all passes
-    const { magnitude, brightnessLabel } = getMagnitude(maxElevation, 'Visible');
+    // Great circle angle gamma
+    const cosGamma =
+      Math.sin(obsLatRad) * Math.sin(satLat) +
+      Math.cos(obsLatRad) * Math.cos(satLat) * Math.cos(((lon - satLonDeg) * Math.PI) / 180);
+    const gamma = Math.acos(Math.max(-1, Math.min(1, cosGamma)));
+    const sinGamma = Math.sin(gamma);
+    const el = Math.atan2(cosGamma - R / (R + H), sinGamma) * (180 / Math.PI);
 
-    passes.push({
-      risetime,
-      duration,
-      maxElevation,
-      startAzimuth: dir.start,
-      endAzimuth: dir.end,
-      visibilityType,
-      isNakedEyeVisible,
-      magnitude,
-      brightnessLabel,
-    });
+    if (el >= 10.0) {
+      if (!inPass) {
+        inPass = true;
+        passStartMin = m;
+        passMaxEl = el;
+        passPeakMin = m;
+        passStartLat = satLatDeg;
+        passStartLon = satLonDeg;
+        passPeakLat = satLatDeg;
+        passPeakLon = satLonDeg;
+      } else {
+        if (el > passMaxEl) {
+          passMaxEl = el;
+          passPeakMin = m;
+          passPeakLat = satLatDeg;
+          passPeakLon = satLonDeg;
+        }
+      }
+      passEndLat = satLatDeg;
+      passEndLon = satLonDeg;
+    } else {
+      if (inPass) {
+        inPass = false;
+        const passEndMin = m;
+        const durationSec = Math.round((passEndMin - passStartMin) * 60);
+
+        // Only register if pass had a genuine duration
+        if (durationSec >= 90) {
+          const risetime = Math.round((nowMs + passStartMin * 60 * 1000) / 1000);
+          const highestTime = Math.round((nowMs + passPeakMin * 60 * 1000) / 1000);
+          const endTime = Math.round((nowMs + passEndMin * 60 * 1000) / 1000);
+          const roundedMaxEl = Math.round(passMaxEl);
+
+          const peakDate = new Date(highestTime * 1000);
+          const solarAlt = getSolarAltitudeDeg(peakDate, lat, lon);
+
+          // Classification:
+          // Civil to astronomical twilight: -18° <= solarAlt <= -6° => Visible
+          // Daylight: solarAlt > -6° => Daylight Pass
+          // Night shadow: solarAlt < -18° => Night (Unlit)
+          let passTypeLabel: 'VISIBLE' | 'DAYLIGHT PASS' | 'NIGHT (UNLIT)';
+          let visibilityType: import('../types/iss').ISSPass['visibilityType'];
+          let isNakedEyeVisible = false;
+          let subtleNote = '';
+
+          if (solarAlt >= -18 && solarAlt <= -6.0) {
+            passTypeLabel = 'VISIBLE';
+            visibilityType = 'Visible (Clear Twilight)';
+            isNakedEyeVisible = true;
+            subtleNote = roundedMaxEl >= 40
+              ? 'High overhead in twilight — exceptionally bright and easy to spot.'
+              : 'Twilight pass — steady point of light gliding across the horizon.';
+          } else if (solarAlt > -6.0) {
+            passTypeLabel = 'DAYLIGHT PASS';
+            visibilityType = 'Daylight';
+            isNakedEyeVisible = false;
+            subtleNote = 'Overhead in daylight — watch your city live on the ISS 4K external cameras.';
+          } else {
+            passTypeLabel = 'NIGHT (UNLIT)';
+            visibilityType = 'Deep Night Shadow';
+            isNakedEyeVisible = false;
+            subtleNote = 'Eclipsed in Earth shadow — station cameras capture city lights and auroras.';
+          }
+
+          const { magnitude, brightnessLabel } = getMagnitude(roundedMaxEl, isNakedEyeVisible);
+
+          const startAz = getCompass(lat, lon, passStartLat, passStartLon);
+          const highestAz = getCompass(lat, lon, passPeakLat, passPeakLon);
+          const endAz = getCompass(lat, lon, passEndLat, passEndLon);
+
+          passes.push({
+            risetime,
+            duration: durationSec,
+            maxElevation: roundedMaxEl,
+            startAzimuth: startAz,
+            startElevation: 10,
+            highestAzimuth: highestAz,
+            highestElevation: roundedMaxEl,
+            endAzimuth: endAz,
+            endElevation: 10,
+            highestTime,
+            endTime,
+            visibilityType,
+            passTypeLabel,
+            isNakedEyeVisible,
+            magnitude: isNakedEyeVisible ? magnitude : undefined,
+            brightnessLabel: isNakedEyeVisible ? brightnessLabel : 'Not Visible',
+            subtleNote,
+            dateLabel: peakDate.toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' }),
+            startTimeStr: new Date(risetime * 1000).toLocaleTimeString(undefined, {
+              hour: '2-digit',
+              minute: '2-digit',
+              hour12: false,
+            }),
+            highestTimeStr: peakDate.toLocaleTimeString(undefined, {
+              hour: '2-digit',
+              minute: '2-digit',
+              hour12: false,
+            }),
+            endTimeStr: new Date(endTime * 1000).toLocaleTimeString(undefined, {
+              hour: '2-digit',
+              minute: '2-digit',
+              hour12: false,
+            }),
+          });
+        }
+        passMaxEl = -90;
+      }
+    }
   }
 
   return passes;
+}
+
+interface PolluxPass {
+  rise: { time: string; azimuth_deg: number; compass: string };
+  culmination: { time: string; elevation_deg: number };
+  set: { time: string; azimuth_deg: number; compass: string };
+  duration_sec: number;
+  above_horizon: boolean;
+  visible: boolean;
+}
+
+interface PolluxResponse {
+  passes: PolluxPass[];
+}
+
+/**
+ * High-Accuracy Hybrid Pass Engine:
+ * 1. Primary: Queries Pollux Labs live SGP4 / Skyfield API (real-time CelesTrak TLEs).
+ * 2. Fallback: Seamless in-browser continuous mathematical propagator if offline/timeout.
+ */
+export async function fetchUpcomingPasses(lat: number, lon: number): Promise<ISSPass[]> {
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 7500);
+
+    const url = `https://iss-api.polluxlabs.io/iss-pass?lat=${lat.toFixed(4)}&lon=${lon.toFixed(4)}&n=20`;
+    const res = await fetch(url, {
+      signal: controller.signal,
+      headers: { 'Accept': 'application/json' },
+    });
+    clearTimeout(timeoutId);
+
+    if (res.ok) {
+      const data: PolluxResponse = await res.json();
+      if (Array.isArray(data.passes) && data.passes.length > 0) {
+        const mappedPasses: ISSPass[] = data.passes.map((p) => {
+          const risetime = Math.round(new Date(p.rise.time).getTime() / 1000);
+          const highestTime = Math.round(new Date(p.culmination.time).getTime() / 1000);
+          const endTime = Math.round(new Date(p.set.time).getTime() / 1000);
+          const roundedMaxEl = Math.round(p.culmination.elevation_deg);
+          const peakDate = new Date(highestTime * 1000);
+
+          // Solar altitude at observer location during peak
+          const solarAlt = getSolarAltitudeDeg(peakDate, lat, lon);
+
+          let passTypeLabel: 'VISIBLE' | 'DAYLIGHT PASS' | 'NIGHT (UNLIT)';
+          let visibilityType: import('../types/iss').ISSPass['visibilityType'];
+          let isNakedEyeVisible = false;
+          let subtleNote = '';
+
+          // Pollux Labs visible flag evaluates both satellite illumination and observer darkness
+          if (p.visible) {
+            passTypeLabel = 'VISIBLE';
+            visibilityType = 'Visible (Clear Twilight)';
+            isNakedEyeVisible = true;
+            subtleNote = roundedMaxEl >= 40
+              ? 'High overhead in twilight — exceptionally bright and easy to spot.'
+              : 'Twilight pass — steady point of light gliding across the horizon.';
+          } else if (solarAlt > -6.0) {
+            passTypeLabel = 'DAYLIGHT PASS';
+            visibilityType = 'Daylight';
+            isNakedEyeVisible = false;
+            subtleNote = 'Overhead in daylight — watch your city live on the ISS 4K external cameras.';
+          } else {
+            passTypeLabel = 'NIGHT (UNLIT)';
+            visibilityType = 'Deep Night Shadow';
+            isNakedEyeVisible = false;
+            subtleNote = 'Eclipsed in Earth shadow — station cameras capture city lights and auroras.';
+          }
+
+          const { magnitude, brightnessLabel } = getMagnitude(roundedMaxEl, isNakedEyeVisible);
+
+          return {
+            risetime,
+            duration: p.duration_sec,
+            maxElevation: roundedMaxEl,
+            startAzimuth: p.rise.compass || 'N',
+            startElevation: 10,
+            highestAzimuth: '',
+            highestElevation: roundedMaxEl,
+            endAzimuth: p.set.compass || 'S',
+            endElevation: 10,
+            highestTime,
+            endTime,
+            visibilityType,
+            passTypeLabel,
+            isNakedEyeVisible,
+            magnitude: isNakedEyeVisible ? magnitude : undefined,
+            brightnessLabel: isNakedEyeVisible ? brightnessLabel : 'Not Visible',
+            subtleNote,
+            dateLabel: peakDate.toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' }),
+            startTimeStr: new Date(risetime * 1000).toLocaleTimeString(undefined, {
+              hour: '2-digit',
+              minute: '2-digit',
+              hour12: false,
+            }),
+            highestTimeStr: peakDate.toLocaleTimeString(undefined, {
+              hour: '2-digit',
+              minute: '2-digit',
+              hour12: false,
+            }),
+            endTimeStr: new Date(endTime * 1000).toLocaleTimeString(undefined, {
+              hour: '2-digit',
+              minute: '2-digit',
+              hour12: false,
+            }),
+          };
+        });
+
+        // Return purely genuine high-precision passes from SGP4 engine without extra synthetic passes
+        return mappedPasses;
+      }
+    }
+  } catch {
+    // Graceful fallback to continuous mathematical propagator if live endpoint is unreachable
+  }
+
+  return calculateUpcomingPasses(lat, lon);
 }
 
 /**

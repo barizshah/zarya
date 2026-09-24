@@ -7,15 +7,20 @@ export const MapTracker: React.FC = () => {
 
   // ESA tracker has a fixed internal layout size of 625px × 352px (16:9)
   // When embedded directly in an iframe, any width !== 625 leaves white background bars.
-  // We dynamically scale the 625×352 iframe to perfectly fill 100% of the parent container.
+  // We dynamically scale the 625×352 iframe with requestAnimationFrame to perfectly fill 100% of the parent container.
   useEffect(() => {
+    let rafId: number | null = null;
     const updateScale = () => {
-      if (containerRef.current) {
-        const currentWidth = containerRef.current.clientWidth;
-        if (currentWidth > 0) {
-          setScale(currentWidth / 625);
+      if (rafId !== null) cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(() => {
+        if (containerRef.current) {
+          const rect = containerRef.current.getBoundingClientRect();
+          const currentWidth = rect.width;
+          if (currentWidth > 0) {
+            setScale(currentWidth / 625);
+          }
         }
-      }
+      });
     };
 
     updateScale();
@@ -26,6 +31,7 @@ export const MapTracker: React.FC = () => {
     }
 
     return () => {
+      if (rafId !== null) cancelAnimationFrame(rafId);
       window.removeEventListener('resize', updateScale);
       observer.disconnect();
     };
@@ -34,14 +40,15 @@ export const MapTracker: React.FC = () => {
   return (
     <div
       ref={containerRef}
-      className="map-container relative w-full h-full bg-[#000000] overflow-hidden flex items-center justify-center"
+      className="map-container relative w-full h-full bg-[#000000] overflow-hidden flex items-center justify-center select-none"
       style={{
         aspectRatio: '16 / 9',
         position: 'relative',
+        backgroundColor: '#000000',
       }}
     >
       {!isLoaded && (
-        <div className="absolute inset-0 flex items-center justify-center bg-[#070b14] z-10">
+        <div className="absolute inset-0 flex items-center justify-center bg-[#000000] z-10 transition-opacity duration-300">
           <div className="loading-spinner-large" />
         </div>
       )}
@@ -52,7 +59,7 @@ export const MapTracker: React.FC = () => {
         title="ESA ISS Tracker"
         className="border-0 select-none"
         allow="fullscreen"
-        loading="lazy"
+        loading="eager"
         onLoad={() => setIsLoaded(true)}
         style={{
           width: '625px',
@@ -62,11 +69,13 @@ export const MapTracker: React.FC = () => {
           maxWidth: '625px',
           maxHeight: '352px',
           border: 'none',
+          outline: 'none',
           display: 'block',
           transform: `scale(${scale})`,
           transformOrigin: 'center center',
           pointerEvents: 'auto',
           backgroundColor: '#000000',
+          willChange: 'transform',
         }}
       />
     </div>

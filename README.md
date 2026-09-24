@@ -39,16 +39,16 @@ No app install. No sign-up. Just open it and watch the ISS fly over you in real 
 
 | Feature | Details |
 |---|---|
-| 📡 **Live Telemetry** | Altitude, velocity, lat/lon, and overhead region — refreshed every 4 seconds |
-| 🌦️ **ISS Surface Weather** | Live surface weather (temperature, cloud cover %, conditions) at ISS sub-satellite coordinates |
-| 🗺️ **ESA Orbital Tracker** | Live precision ground track via the European Space Agency's ISS tracker |
-| 📺 **Multi-feed Live Video** | Switch between Sen 4K Ultra HD, NASA HD, and NASA SD mission audio feeds |
-| 🧑‍🚀 **Crew Manifest** | Expedition 73 astronaut cards with bios, agencies, days in space |
-| 🚀 **Launch Schedule** | Upcoming orbital rocket launches from Launch Library 2 |
-| 🌍 **Pass Predictions** | Accurate ISS flyover times with elevation, trajectory, magnitude, and naked-eye daylight filtering |
+| 📡 **Live Telemetry** | Altitude, velocity, lat/lon, visibility, and overhead region — refreshed every 4 seconds |
+| 🌦️ **ISS Surface Weather** | Live surface weather (temperature, cloud cover %, conditions) directly beneath the ISS via Open-Meteo |
+| 🗺️ **ESA Orbital Tracker** | Live precision ground track with day/night terminator via European Space Agency's ISS tracker |
+| 📺 **Multi-feed Live Video** | Switch seamlessly between Sen 4K Ultra HD, NASA HD, and NASA SD mission audio feeds |
+| 🌍 **3-Point Pass Predictions** | Precision flyover times with 3-point trajectory (start, culmination peak, departure), visual magnitude (`-3.5 mag Brilliant`), and daylight vs twilight filtering |
+| 🧑‍🚀 **Crew Manifest** | Expedition 73 astronaut cards with portraits, agencies, roles, bios, and days-in-space counters |
+| 🚀 **Launch Schedule** | Upcoming orbital rocket launches from Launch Library 2 with automatic fallback |
 | 🏢 **Launch Sites** | Major spaceports and orbital launch complexes worldwide |
 | 🏛️ **Space Agencies** | NASA, ESA, Roscosmos, JAXA, CSA, ISRO, and more |
-| ❓ **FAQ** | Answers to common questions about the ISS, cameras, and space |
+| ❓ **FAQ & Overpass Facts** | In-depth answers about the ISS and dynamic educational facts contextualized to current ground track |
 
 ---
 
@@ -132,11 +132,13 @@ npm run build
 
 | Source | Used For |
 |---|---|
-| [WhereTheISS.at](https://wheretheiss.at) | Primary live ISS position telemetry |
-| [ESA ISS Tracker](https://isstracker.spaceflight.esa.int/) | Ground track map |
+| [WhereTheISS.at](https://wheretheiss.at) | Primary live ISS position and velocity telemetry |
+| [ESA ISS Tracker](https://isstracker.spaceflight.esa.int/) | Precision ground track map & orbit trajectory |
+| [Open-Meteo](https://open-meteo.com) | Sub-satellite real-time surface meteorology & cloud cover |
+| [Pollux Labs / SGP4](https://polluxlabs.net) | SGP4 orbital mechanics pass flyover calculations |
 | [Sen.com via YouTube](https://www.youtube.com/@Sen) | 4K Ultra HD live camera feed |
 | [NASA YouTube](https://www.youtube.com/@NASA) | HD & SD camera + mission audio feeds |
-| [Launch Library 2](https://thespacedevs.com/llapi) | Upcoming rocket launch schedule |
+| [Launch Library 2](https://thespacedevs.com/llapi) | Upcoming orbital rocket launch schedule |
 | [OpenStreetMap Nominatim](https://nominatim.openstreetmap.org) | Reverse geocoding for ISS overhead location |
 
 All data is fetched in real-time client-side — no backend server required.

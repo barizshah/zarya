@@ -30,35 +30,71 @@ function getDaysInSpace(launchDate?: string): number | null {
 }
 
 export const CrewModal: React.FC<CrewModalProps> = ({ isOpen, onClose, crew }) => {
+  // Prevent background scrolling when modal is open
+  React.useEffect(() => {
+    if (!isOpen) return;
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = originalOverflow;
+    };
+  }, [isOpen]);
+
+  // Close on Escape key press
+  React.useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
 
   const crewDragon = crew.filter(c => !c.craft?.toLowerCase().includes('soyuz'));
   const soyuz = crew.filter(c => c.craft?.toLowerCase().includes('soyuz'));
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fadeIn">
-      <div className="bg-[#181818] border border-white/[0.1] rounded-2xl w-full max-w-3xl max-h-[88vh] overflow-hidden flex flex-col shadow-2xl">
-        {/* Modal Header */}
-        <div className="p-4 md:p-5 border-b border-white/[0.08] flex items-center justify-between bg-[#212121]">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-[#76FF03]/15 border border-[#76FF03]/30 flex items-center justify-center">
+    <div
+      className="fixed inset-0 z-[2000] flex items-center justify-center p-3 sm:p-4 pt-[calc(env(safe-area-inset-top)+14px)] pb-[calc(env(safe-area-inset-bottom)+14px)] bg-black/85 backdrop-blur-md animate-fadeIn"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
+      <div className="bg-[#181818] border border-white/[0.1] rounded-2xl w-full max-w-3xl max-h-[calc(100dvh-28px-env(safe-area-inset-top)-env(safe-area-inset-bottom))] sm:max-h-[85vh] overflow-hidden flex flex-col shadow-2xl animate-scaleUp">
+        {/* Sticky Modal Header */}
+        <div className="p-3 sm:p-4 border-b border-white/[0.08] flex items-center justify-between gap-2 bg-[#212121] shrink-0 sticky top-0 z-20">
+          <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
+            <div className="w-8 h-8 rounded-lg bg-[#76FF03]/15 border border-[#76FF03]/30 flex items-center justify-center shrink-0">
               <Users className="w-4 h-4 text-[#76FF03]" />
             </div>
-            <div>
-              <h3 className="text-base font-bold text-white font-mono">ISS Expedition 73 Crew</h3>
-              <p className="text-xs text-[#aaaaaa]">{crew.length} astronauts currently aboard the orbital laboratory</p>
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-2 flex-wrap">
+                <h3 className="text-sm sm:text-base font-bold text-white font-mono leading-tight">
+                  ISS Expedition 73
+                </h3>
+                <span className="text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded bg-[#76FF03]/15 text-[#76FF03] border border-[#76FF03]/30">
+                  Exp. 73
+                </span>
+              </div>
+              <p className="text-[10.5px] sm:text-xs text-[#cccccc] truncate mt-0.5">
+                {crew.length} astronauts currently aboard
+              </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-[#aaaaaa] hover:text-white hover:bg-white/[0.08] transition-colors cursor-pointer"
+            type="button"
+            className="w-9 h-9 sm:w-8 sm:h-8 rounded-xl bg-white/[0.08] hover:bg-white/[0.15] active:bg-[#76FF03]/20 border border-white/[0.12] active:border-[#76FF03]/40 flex items-center justify-center text-white active:text-[#76FF03] transition-all cursor-pointer shrink-0 touch-manipulation shadow-sm"
+            aria-label="Close dialog"
           >
-            <X className="w-5 h-5" />
+            <X className="w-5 h-5 text-white" />
           </button>
         </div>
 
-        {/* Modal Body */}
-        <div className="p-5 overflow-y-auto space-y-6">
+        {/* Modal Body with smooth momentum scrolling */}
+        <div className="p-3 sm:p-5 overflow-y-auto space-y-4 sm:space-y-6 overscroll-contain">
           {/* Crew Dragon / Crew-12 */}
           {crewDragon.length > 0 && (
             <div>
@@ -189,31 +225,31 @@ export const CrewModal: React.FC<CrewModalProps> = ({ isOpen, onClose, crew }) =
           )}
 
           {/* Station stats footer */}
-          <div className="p-3.5 rounded-xl bg-[#0f0f0f] border border-white/[0.06] flex flex-wrap gap-4">
+          <div className="p-3.5 rounded-xl bg-[#0f0f0f] border border-white/[0.08] flex flex-wrap gap-4 items-center justify-between">
             <div>
-              <div className="text-[10px] font-mono text-[#555] uppercase tracking-wider">Total Crew</div>
-              <div className="text-sm font-mono font-bold text-white">{crew.length} People</div>
+              <div className="text-[10px] font-mono text-[#aaaaaa] uppercase tracking-wider font-semibold">Total Crew</div>
+              <div className="text-sm font-mono font-bold text-white mt-0.5">{crew.length} People</div>
             </div>
             <div>
-              <div className="text-[10px] font-mono text-[#555] uppercase tracking-wider">Expedition</div>
-              <div className="text-sm font-mono font-bold text-white">ISS Exp. 73</div>
+              <div className="text-[10px] font-mono text-[#76FF03] uppercase tracking-wider font-semibold">Expedition</div>
+              <div className="text-sm font-mono font-bold text-white mt-0.5">ISS Exp. 73</div>
             </div>
             <div>
-              <div className="text-[10px] font-mono text-[#555] uppercase tracking-wider">Altitude</div>
-              <div className="text-sm font-mono font-bold text-[#76FF03]">~408 km LEO</div>
+              <div className="text-[10px] font-mono text-[#aaaaaa] uppercase tracking-wider font-semibold">Altitude</div>
+              <div className="text-sm font-mono font-bold text-[#76FF03] mt-0.5">~408 km LEO</div>
             </div>
             <div>
-              <div className="text-[10px] font-mono text-[#555] uppercase tracking-wider">Orbital Period</div>
-              <div className="text-sm font-mono font-bold text-white">92.68 min</div>
+              <div className="text-[10px] font-mono text-[#aaaaaa] uppercase tracking-wider font-semibold">Orbital Period</div>
+              <div className="text-sm font-mono font-bold text-white mt-0.5">92.68 min</div>
             </div>
           </div>
         </div>
 
         {/* Modal Footer */}
-        <div className="p-4 border-t border-white/[0.08] bg-[#181818] flex justify-end">
+        <div className="p-3 sm:p-4 border-t border-white/[0.08] bg-[#181818] flex justify-end shrink-0">
           <button
             onClick={onClose}
-            className="px-4 py-1.5 rounded-lg bg-white/[0.08] hover:bg-white/[0.12] text-white text-xs font-medium transition-colors cursor-pointer"
+            className="w-full sm:w-auto px-5 py-2.5 sm:py-1.5 rounded-lg bg-white/[0.08] hover:bg-white/[0.12] text-white text-xs font-medium transition-colors cursor-pointer text-center"
           >
             Close
           </button>

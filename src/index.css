@@ -88,7 +88,7 @@ body {
   color: #f1f1f1 !important;
 }
 
-/* Ensure map and video containers align seamlessly */
+/* Ensure map and video containers align seamlessly with zero white lines */
 .map-section,
 .video-section {
   aspect-ratio: 16 / 9;
@@ -98,6 +98,11 @@ body {
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5) !important;
   background: #000000 !important;
   transition: all 0.2s ease !important;
+  background-clip: padding-box;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
 .map-section:hover,
@@ -112,6 +117,15 @@ body {
   height: 100% !important;
   aspect-ratio: 16 / 9;
   border-radius: 12px !important;
+  background-color: #000000 !important;
+  overflow: hidden !important;
+}
+
+/* Ensure iframe within map tracker never bleeds white edges */
+.map-section iframe {
+  background-color: #000000 !important;
+  outline: none !important;
+  border: none !important;
 }
 
 /* YouTube Studio Dark Card & Glass Styling */
@@ -196,22 +210,164 @@ body {
   line-height: 1.6 !important;
 }
 
-/* ── Mobile Responsive Improvements ──────────────────────────────────────── */
+/* ── Stream Controls & Jump Navigation Base Styling ───────────────────────── */
+
+/* ── Stream Controls Toolbar Base Styling ──────────────────────────────────── */
+
+.stream-toggles-bar {
+  background: #181818 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 12px !important;
+  padding: 12px 18px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4) !important;
+}
+
+.stream-group {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.group-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #aaaaaa;
+  margin-right: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.feeds-boxes-grid {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.feed-box-btn {
+  padding: 8px 16px !important;
+  font-size: 12px !important;
+  min-height: 40px !important;
+}
+
+.jump-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  height: 34px !important;
+  min-height: 34px !important;
+  padding: 6px 14px !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  border-radius: 8px !important;
+  transition: all 0.2s ease !important;
+}
+
+/* 3-Box Grid for Jump Section (Symmetrical 3 Columns on Mobile) */
+.jump-grid-3col {
+  display: grid !important;
+  grid-template-columns: repeat(3, 1fr) !important;
+  gap: 5px !important;
+  width: 100% !important;
+}
+
+.jump-box-btn {
+  width: 100% !important;
+}
+
+.jump-box-btn .material-icons {
+  font-size: 14px !important;
+}
+
+/* Symmetrical Bottom FAQ Button on Mobile */
+.jump-faq-bottom-btn {
+  width: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  height: 26px !important;
+  min-height: 26px !important;
+  padding: 2px 10px !important;
+  font-size: 10.5px !important;
+  font-weight: 500 !important;
+  border-radius: 6px !important;
+  margin-top: 3px !important;
+}
+
+/* ── Desktop Minimal First Page Spacing ─────────────────────────────────── */
+@media (min-width: 769px) {
+  /* Keep original content-layout padding & gap */
+  .content-layout {
+    gap: 20px !important;
+    padding: 20px !important;
+  }
+
+  /* Keep original video-map-container layout and spacing */
+  .video-map-container {
+    gap: 20px !important;
+  }
+
+  /* Feeds toggles: prominent, comfortable desktop size */
+  .stream-toggles-bar {
+    padding: 12px 18px !important;
+    margin-top: 2px !important;
+    margin-bottom: 2px !important;
+  }
+
+  .feed-box-btn {
+    padding: 9px 18px !important;
+    font-size: 13px !important;
+    min-height: 42px !important;
+  }
+
+  .feed-box-icon {
+    font-size: 18px !important;
+  }
+
+  .jump-btn {
+    height: 34px !important;
+    padding: 6px 14px !important;
+    font-size: 12px !important;
+  }
+
+  /* Telemetry info section spacing */
+  .info-section {
+    margin-top: 14px !important;
+    margin-bottom: 12px !important;
+  }
+
+  /* Push Orbital Overpass Fact to next fold/scroll */
+  .overpass-fact-card {
+    margin-top: 28px !important;
+  }
+}
+
+/* ── Mobile Responsive Improvements & Symmetry ─────────────────────────── */
 
 @media (max-width: 768px) {
-  /* Tighter content padding on mobile */
+  /* Clean mobile layout padding and container spacing */
   .content-layout {
-    padding: 12px !important;
-    gap: 12px !important;
+    padding: 6px 10px !important;
+    gap: 7px !important;
   }
 
-  /* Stack video and map vertically on mobile */
+  /* Original video and map container spacing */
   .video-map-container {
     flex-direction: column !important;
-    gap: 10px !important;
+    gap: 7px !important;
   }
 
-  /* Full-width panels on mobile */
+  /* Full-width panels on mobile with original natural 16:9 aspect ratio */
   .video-section,
   .map-section {
     width: 100% !important;
@@ -219,7 +375,108 @@ body {
     flex: 0 0 auto !important;
   }
 
-  /* Tighter section padding on mobile */
+  .map-section .map-container,
+  .video-section .video-player {
+    width: 100% !important;
+    aspect-ratio: 16 / 9 !important;
+  }
+
+  /* Stream controls toolbar contained within the first page on mobile */
+  .stream-toggles-bar {
+    padding: 8px 10px !important;
+    gap: 8px !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    border-radius: 12px !important;
+  }
+
+  .stream-group {
+    width: 100% !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 4px !important;
+  }
+
+  /* Centered and symmetric feed controls */
+  .stream-group.feed-group {
+    align-items: center !important;
+    text-align: center !important;
+  }
+
+  .feed-group .group-label {
+    align-self: center !important;
+    justify-content: center !important;
+    font-size: 9.5px !important;
+    margin-right: 0 !important;
+  }
+
+  .feeds-boxes-grid {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 6px !important;
+    width: 100% !important;
+    justify-items: center !important;
+    align-items: center !important;
+  }
+
+  .feed-box-btn {
+    width: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    height: 34px !important;
+    min-height: 34px !important;
+    padding: 0 4px !important;
+    border-radius: 8px !important;
+    text-align: center !important;
+  }
+
+  .feed-box-btn .feed-box-icon {
+    font-size: 16px !important;
+  }
+
+  /* Jump group on mobile */
+  .jump-group .group-label {
+    align-self: flex-start !important;
+    font-size: 9.5px !important;
+  }
+
+  .jump-grid-3col {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 5px !important;
+    width: 100% !important;
+  }
+
+  .jump-box-btn {
+    width: 100% !important;
+    height: 30px !important;
+    min-height: 30px !important;
+    padding: 2px 4px !important;
+    font-size: 10.5px !important;
+    border-radius: 6px !important;
+  }
+
+  .jump-box-btn .material-icons {
+    font-size: 13px !important;
+  }
+
+  .jump-faq-bottom-btn {
+    width: 100% !important;
+    height: 26px !important;
+    min-height: 26px !important;
+    font-size: 10.5px !important;
+    border-radius: 6px !important;
+    margin-top: 3px !important;
+  }
+
+  /* Strict separation for telemetry section: zero bleed into first screen */
+  .info-section {
+    margin-top: 32px !important;
+    padding-top: 16px !important;
+  }
+
+  /* Section padding on mobile */
   .content-section {
     padding: 16px 0 !important;
   }
@@ -228,22 +485,41 @@ body {
   .iss-fact-desktop-card {
     display: none !important;
   }
-
-  /* Stream toggles bar: compact on mobile */
-  .stream-toggles-bar {
-    padding: 10px 12px !important;
-    gap: 8px !important;
-  }
 }
 
 @media (max-width: 480px) {
   .content-layout {
-    padding: 8px !important;
-    gap: 8px !important;
+    padding: 5px 8px !important;
+    gap: 6px !important;
   }
 
-  /* Even tighter padding on very small phones */
+  .video-map-container {
+    gap: 6px !important;
+  }
+
   .stream-toggles-bar {
-    padding: 8px 10px !important;
+    padding: 6px 8px !important;
+  }
+
+  .feed-box-btn {
+    height: 32px !important;
+    min-height: 32px !important;
+  }
+
+  .jump-box-btn {
+    height: 28px !important;
+    min-height: 28px !important;
+    font-size: 10px !important;
+  }
+
+  .jump-faq-bottom-btn {
+    height: 25px !important;
+    min-height: 25px !important;
+    font-size: 10px !important;
+  }
+
+  .info-section {
+    margin-top: 28px !important;
+    padding-top: 14px !important;
   }
 }

@@ -63,32 +63,10 @@ export const IssContentSections: React.FC<IssContentSectionsProps> = ({
   return (
     <>
       {/* 1. Quick Control Toggles Toolbar (Directly Below Video/Map) */}
-      <section className="stream-toggles-bar" style={{
-        background: '#181818',
-        border: '1px solid rgba(255, 255, 255, 0.1)',
-        borderRadius: '12px',
-        padding: '12px 18px',
-        display: 'flex',
-        flexWrap: 'wrap',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        gap: '12px',
-        boxShadow: '0 4px 20px rgba(0, 0, 0, 0.4)',
-      }}>
+      <section className="stream-toggles-bar">
         {/* Live Stream Camera Toggles */}
-        <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
-          <span style={{
-            fontSize: '11px',
-            fontWeight: 700,
-            textTransform: 'uppercase',
-            letterSpacing: '1px',
-            color: '#aaaaaa',
-            marginRight: '4px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '6px',
-            fontFamily: 'JetBrains Mono, monospace',
-          }}>
+        <div className="stream-group feed-group">
+          <span className="group-label">
             <span className="flex h-2 w-2 relative shrink-0">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#76FF03] opacity-60" />
               <span className="relative inline-flex rounded-full h-2 w-2 bg-[#76FF03] shadow-[0_0_8px_#76FF03]" />
@@ -96,147 +74,234 @@ export const IssContentSections: React.FC<IssContentSectionsProps> = ({
             Feeds:
           </span>
 
-          {/* 1. 4K Camera Toggle */}
-          <button
-            onClick={() => onSelectCamera('4k')}
-            className={`transition-all duration-200 rounded-lg flex items-center gap-2 px-3.5 py-2 min-h-[40px] text-xs font-medium cursor-pointer ${
-              activeCamera === '4k'
-                ? 'bg-[#76FF03] text-black font-semibold shadow-md shadow-[#76FF03]/25'
-                : 'bg-[#272727] text-white hover:bg-[#3f3f3f] border border-white/[0.06]'
-            }`}
-          >
-            <span className="material-icons" style={{ fontSize: '16px' }}>4k</span>
-            <span>4K Camera</span>
-          </button>
+          <div className="feeds-boxes-grid">
+            {/* 1. 4K Camera Toggle */}
+            <button
+              onClick={() => onSelectCamera('4k')}
+              className={`feed-box-btn transition-all duration-200 rounded-xl flex items-center justify-center gap-1.5 sm:gap-2 px-3 py-2 cursor-pointer ${
+                activeCamera === '4k'
+                  ? 'bg-[#76FF03] text-black font-semibold shadow-md shadow-[#76FF03]/25 border border-[#76FF03]'
+                  : 'bg-[#212121] text-white hover:bg-[#2e2e2e] border border-white/[0.08]'
+              }`}
+            >
+              <span className="material-icons feed-box-icon" style={{ fontSize: '18px' }}>4k</span>
+              <span className="feed-label-full hidden sm:inline text-xs font-semibold">4K Camera</span>
+              <span className="feed-label-short inline sm:hidden text-xs font-bold font-mono">4K</span>
+            </button>
 
-          {/* 2. HD Camera Toggle */}
-          <button
-            onClick={() => onSelectCamera('hd')}
-            className={`transition-all duration-200 rounded-lg flex items-center gap-2 px-3.5 py-2 min-h-[40px] text-xs font-medium cursor-pointer ${
-              activeCamera === 'hd'
-                ? 'bg-[#76FF03] text-black font-semibold shadow-md shadow-[#76FF03]/25'
-                : 'bg-[#272727] text-white hover:bg-[#3f3f3f] border border-white/[0.06]'
-            }`}
-          >
-            <span className="material-icons" style={{ fontSize: '16px' }}>hd</span>
-            <span>HD Camera</span>
-          </button>
+            {/* 2. HD Camera Toggle */}
+            <button
+              onClick={() => onSelectCamera('hd')}
+              className={`feed-box-btn transition-all duration-200 rounded-xl flex items-center justify-center gap-1.5 sm:gap-2 px-3 py-2 cursor-pointer ${
+                activeCamera === 'hd'
+                  ? 'bg-[#76FF03] text-black font-semibold shadow-md shadow-[#76FF03]/25 border border-[#76FF03]'
+                  : 'bg-[#212121] text-white hover:bg-[#2e2e2e] border border-white/[0.08]'
+              }`}
+            >
+              <span className="material-icons feed-box-icon" style={{ fontSize: '18px' }}>hd</span>
+              <span className="feed-label-full hidden sm:inline text-xs font-semibold">HD Camera</span>
+              <span className="feed-label-short inline sm:hidden text-xs font-bold font-mono">HD</span>
+            </button>
 
-          {/* 3. SD Camera Toggle */}
-          <button
-            onClick={() => onSelectCamera('sd')}
-            className={`transition-all duration-200 rounded-lg flex items-center gap-2 px-3.5 py-2 min-h-[40px] text-xs font-medium cursor-pointer ${
-              activeCamera === 'sd'
-                ? 'bg-[#76FF03] text-black font-semibold shadow-md shadow-[#76FF03]/25'
-                : 'bg-[#272727] text-white hover:bg-[#3f3f3f] border border-white/[0.06]'
-            }`}
-          >
-            <span className="material-icons" style={{ fontSize: '16px' }}>videocam</span>
-            <span>SD Camera</span>
-          </button>
+            {/* 3. SD Camera Toggle */}
+            <button
+              onClick={() => onSelectCamera('sd')}
+              className={`feed-box-btn transition-all duration-200 rounded-xl flex items-center justify-center gap-1.5 sm:gap-2 px-3 py-2 cursor-pointer ${
+                activeCamera === 'sd'
+                  ? 'bg-[#76FF03] text-black font-semibold shadow-md shadow-[#76FF03]/25 border border-[#76FF03]'
+                  : 'bg-[#212121] text-white hover:bg-[#2e2e2e] border border-white/[0.08]'
+              }`}
+            >
+              <span className="material-icons feed-box-icon" style={{ fontSize: '18px' }}>videocam</span>
+              <span className="feed-label-full hidden sm:inline text-xs font-semibold">SD Camera</span>
+              <span className="feed-label-short inline sm:hidden text-xs font-bold font-mono">SD</span>
+            </button>
+          </div>
         </div>
 
         {/* Learn Section Jump Links */}
-        <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '6px' }}>
-          <span style={{
-            fontSize: '11px',
-            fontWeight: 700,
-            textTransform: 'uppercase',
-            letterSpacing: '1px',
-            color: '#aaaaaa',
-            marginRight: '4px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '6px',
-            fontFamily: 'JetBrains Mono, monospace',
-          }}>
+        <div className="stream-group jump-group">
+          <span className="group-label">
             <span className="material-icons" style={{ fontSize: '14px', color: '#76FF03' }}>explore</span>
             Jump:
           </span>
 
-          <button
-            onClick={() => handleNavClick('passesSection')}
-            className={`transition-all duration-200 rounded-lg flex items-center gap-1.5 px-3 py-1.5 min-h-[36px] text-xs font-medium cursor-pointer ${
-              activeSection === 'passesSection'
-                ? 'bg-[#76FF03]/20 text-[#76FF03] border border-[#76FF03]/40'
-                : 'bg-[#272727] text-[#e0e0e0] hover:bg-[#3f3f3f] border border-white/[0.06]'
-            }`}
-          >
-            <span className="material-icons" style={{ fontSize: '15px' }}>visibility</span>
-            <span>Passes</span>
-          </button>
+          {/* Desktop Horizontal Jump Row (All 7 destinations) */}
+          <div className="desktop-jump-row hidden sm:flex items-center flex-wrap gap-2">
+            <button
+              onClick={() => handleNavClick('passesSection')}
+              className={`jump-btn transition-all duration-200 rounded-lg flex items-center justify-center gap-1 px-2.5 py-1.5 text-xs font-medium cursor-pointer ${
+                activeSection === 'passesSection'
+                  ? 'bg-[#76FF03]/20 text-[#76FF03] border border-[#76FF03]/40'
+                  : 'bg-[#272727] text-[#e0e0e0] hover:bg-[#3f3f3f] border border-white/[0.06]'
+              }`}
+            >
+              <span className="material-icons" style={{ fontSize: '14px' }}>visibility</span>
+              <span>Passes</span>
+            </button>
 
-          <button
-            onClick={() => handleNavClick('whoIsOnSection')}
-            className={`transition-all duration-200 rounded-lg flex items-center gap-1.5 px-3 py-1.5 min-h-[36px] text-xs font-medium cursor-pointer ${
-              activeSection === 'whoIsOnSection'
-                ? 'bg-[#76FF03]/20 text-[#76FF03] border border-[#76FF03]/40'
-                : 'bg-[#272727] text-[#e0e0e0] hover:bg-[#3f3f3f] border border-white/[0.06]'
-            }`}
-          >
-            <span className="material-icons" style={{ fontSize: '15px' }}>people</span>
-            <span>Crew</span>
-          </button>
+            <button
+              onClick={() => handleNavClick('whoIsOnSection')}
+              className={`jump-btn transition-all duration-200 rounded-lg flex items-center justify-center gap-1 px-2.5 py-1.5 text-xs font-medium cursor-pointer ${
+                activeSection === 'whoIsOnSection'
+                  ? 'bg-[#76FF03]/20 text-[#76FF03] border border-[#76FF03]/40'
+                  : 'bg-[#272727] text-[#e0e0e0] hover:bg-[#3f3f3f] border border-white/[0.06]'
+              }`}
+            >
+              <span className="material-icons" style={{ fontSize: '14px' }}>people</span>
+              <span>Crew</span>
+            </button>
 
-          <button
-            onClick={() => handleNavClick('launchesSection')}
-            className={`transition-all duration-200 rounded-lg flex items-center gap-1.5 px-3 py-1.5 min-h-[36px] text-xs font-medium cursor-pointer ${
-              activeSection === 'launchesSection'
-                ? 'bg-[#76FF03]/20 text-[#76FF03] border border-[#76FF03]/40'
-                : 'bg-[#272727] text-[#e0e0e0] hover:bg-[#3f3f3f] border border-white/[0.06]'
-            }`}
-          >
-            <span className="material-icons" style={{ fontSize: '15px' }}>rocket_launch</span>
-            <span>Launches</span>
-          </button>
+            <button
+              onClick={() => handleNavClick('launchesSection')}
+              className={`jump-btn transition-all duration-200 rounded-lg flex items-center justify-center gap-1 px-2.5 py-1.5 text-xs font-medium cursor-pointer ${
+                activeSection === 'launchesSection'
+                  ? 'bg-[#76FF03]/20 text-[#76FF03] border border-[#76FF03]/40'
+                  : 'bg-[#272727] text-[#e0e0e0] hover:bg-[#3f3f3f] border border-white/[0.06]'
+              }`}
+            >
+              <span className="material-icons" style={{ fontSize: '14px' }}>rocket_launch</span>
+              <span>Launches</span>
+            </button>
 
-          <button
-            onClick={() => handleNavClick('launchSitesSection')}
-            className={`transition-all duration-200 rounded-lg flex items-center gap-1.5 px-3 py-1.5 min-h-[36px] text-xs font-medium cursor-pointer ${
-              activeSection === 'launchSitesSection'
-                ? 'bg-[#76FF03]/20 text-[#76FF03] border border-[#76FF03]/40'
-                : 'bg-[#272727] text-[#e0e0e0] hover:bg-[#3f3f3f] border border-white/[0.06]'
-            }`}
-          >
-            <span className="material-icons" style={{ fontSize: '15px' }}>place</span>
-            <span>Launch Sites</span>
-          </button>
+            <button
+              onClick={() => handleNavClick('launchSitesSection')}
+              className={`jump-btn transition-all duration-200 rounded-lg flex items-center justify-center gap-1 px-2.5 py-1.5 text-xs font-medium cursor-pointer ${
+                activeSection === 'launchSitesSection'
+                  ? 'bg-[#76FF03]/20 text-[#76FF03] border border-[#76FF03]/40'
+                  : 'bg-[#272727] text-[#e0e0e0] hover:bg-[#3f3f3f] border border-white/[0.06]'
+              }`}
+            >
+              <span className="material-icons" style={{ fontSize: '14px' }}>place</span>
+              <span>Sites</span>
+            </button>
 
-          <button
-            onClick={() => handleNavClick('agenciesSection')}
-            className={`transition-all duration-200 rounded-lg flex items-center gap-1.5 px-3 py-1.5 min-h-[36px] text-xs font-medium cursor-pointer ${
-              activeSection === 'agenciesSection'
-                ? 'bg-[#76FF03]/20 text-[#76FF03] border border-[#76FF03]/40'
-                : 'bg-[#272727] text-[#e0e0e0] hover:bg-[#3f3f3f] border border-white/[0.06]'
-            }`}
-          >
-            <span className="material-icons" style={{ fontSize: '15px' }}>public</span>
-            <span>Agencies</span>
-          </button>
+            <button
+              onClick={() => handleNavClick('agenciesSection')}
+              className={`jump-btn transition-all duration-200 rounded-lg flex items-center justify-center gap-1 px-2.5 py-1.5 text-xs font-medium cursor-pointer ${
+                activeSection === 'agenciesSection'
+                  ? 'bg-[#76FF03]/20 text-[#76FF03] border border-[#76FF03]/40'
+                  : 'bg-[#272727] text-[#e0e0e0] hover:bg-[#3f3f3f] border border-white/[0.06]'
+              }`}
+            >
+              <span className="material-icons" style={{ fontSize: '14px' }}>public</span>
+              <span>Agencies</span>
+            </button>
 
-          <button
-            onClick={() => handleNavClick('camerasSection')}
-            className={`transition-all duration-200 rounded-lg flex items-center gap-1.5 px-3 py-1.5 min-h-[36px] text-xs font-medium cursor-pointer ${
-              activeSection === 'camerasSection'
-                ? 'bg-[#76FF03]/20 text-[#76FF03] border border-[#76FF03]/40'
-                : 'bg-[#272727] text-[#e0e0e0] hover:bg-[#3f3f3f] border border-white/[0.06]'
-            }`}
-          >
-            <span className="material-icons" style={{ fontSize: '15px' }}>videocam</span>
-            <span>Cameras</span>
-          </button>
+            <button
+              onClick={() => handleNavClick('camerasSection')}
+              className={`jump-btn transition-all duration-200 rounded-lg flex items-center justify-center gap-1 px-2.5 py-1.5 text-xs font-medium cursor-pointer ${
+                activeSection === 'camerasSection'
+                  ? 'bg-[#76FF03]/20 text-[#76FF03] border border-[#76FF03]/40'
+                  : 'bg-[#272727] text-[#e0e0e0] hover:bg-[#3f3f3f] border border-white/[0.06]'
+              }`}
+            >
+              <span className="material-icons" style={{ fontSize: '14px' }}>videocam</span>
+              <span>Cameras</span>
+            </button>
 
-          <button
-            onClick={() => handleNavClick('faqSection')}
-            className={`transition-all duration-200 rounded-lg flex items-center gap-1.5 px-3 py-1.5 min-h-[36px] text-xs font-medium cursor-pointer ${
-              activeSection === 'faqSection'
-                ? 'bg-[#76FF03]/20 text-[#76FF03] border border-[#76FF03]/40'
-                : 'bg-[#272727] text-[#e0e0e0] hover:bg-[#3f3f3f] border border-white/[0.06]'
-            }`}
-          >
-            <span className="material-icons" style={{ fontSize: '15px' }}>help_outline</span>
-            <span>FAQ</span>
-          </button>
+            <button
+              onClick={() => handleNavClick('faqSection')}
+              className={`jump-btn transition-all duration-200 rounded-lg flex items-center justify-center gap-1 px-2.5 py-1.5 text-xs font-medium cursor-pointer ${
+                activeSection === 'faqSection'
+                  ? 'bg-[#76FF03]/20 text-[#76FF03] border border-[#76FF03]/40'
+                  : 'bg-[#272727] text-[#e0e0e0] hover:bg-[#3f3f3f] border border-white/[0.06]'
+              }`}
+            >
+              <span className="material-icons" style={{ fontSize: '14px' }}>help_outline</span>
+              <span>FAQ</span>
+            </button>
+          </div>
+
+          {/* Mobile 3-Box Grid + Bottom FAQ (Active only on mobile) */}
+          <div className="mobile-jump-wrapper flex sm:hidden flex-col w-full">
+            <div className="jump-grid-3col">
+              <button
+                onClick={() => handleNavClick('passesSection')}
+                className={`jump-btn jump-box-btn transition-all duration-200 cursor-pointer ${
+                  activeSection === 'passesSection'
+                    ? 'bg-[#76FF03]/20 text-[#76FF03] border border-[#76FF03]/40'
+                    : 'bg-[#272727] text-[#e0e0e0] hover:bg-[#3f3f3f] border border-white/[0.06]'
+                }`}
+              >
+                <span className="material-icons">visibility</span>
+                <span>Passes</span>
+              </button>
+
+              <button
+                onClick={() => handleNavClick('whoIsOnSection')}
+                className={`jump-btn jump-box-btn transition-all duration-200 cursor-pointer ${
+                  activeSection === 'whoIsOnSection'
+                    ? 'bg-[#76FF03]/20 text-[#76FF03] border border-[#76FF03]/40'
+                    : 'bg-[#272727] text-[#e0e0e0] hover:bg-[#3f3f3f] border border-white/[0.06]'
+                }`}
+              >
+                <span className="material-icons">people</span>
+                <span>Crew</span>
+              </button>
+
+              <button
+                onClick={() => handleNavClick('launchesSection')}
+                className={`jump-btn jump-box-btn transition-all duration-200 cursor-pointer ${
+                  activeSection === 'launchesSection'
+                    ? 'bg-[#76FF03]/20 text-[#76FF03] border border-[#76FF03]/40'
+                    : 'bg-[#272727] text-[#e0e0e0] hover:bg-[#3f3f3f] border border-white/[0.06]'
+                }`}
+              >
+                <span className="material-icons">rocket_launch</span>
+                <span>Launches</span>
+              </button>
+
+              <button
+                onClick={() => handleNavClick('launchSitesSection')}
+                className={`jump-btn jump-box-btn transition-all duration-200 cursor-pointer ${
+                  activeSection === 'launchSitesSection'
+                    ? 'bg-[#76FF03]/20 text-[#76FF03] border border-[#76FF03]/40'
+                    : 'bg-[#272727] text-[#e0e0e0] hover:bg-[#3f3f3f] border border-white/[0.06]'
+                }`}
+              >
+                <span className="material-icons">place</span>
+                <span>Sites</span>
+              </button>
+
+              <button
+                onClick={() => handleNavClick('agenciesSection')}
+                className={`jump-btn jump-box-btn transition-all duration-200 cursor-pointer ${
+                  activeSection === 'agenciesSection'
+                    ? 'bg-[#76FF03]/20 text-[#76FF03] border border-[#76FF03]/40'
+                    : 'bg-[#272727] text-[#e0e0e0] hover:bg-[#3f3f3f] border border-white/[0.06]'
+                }`}
+              >
+                <span className="material-icons">public</span>
+                <span>Agencies</span>
+              </button>
+
+              <button
+                onClick={() => handleNavClick('camerasSection')}
+                className={`jump-btn jump-box-btn transition-all duration-200 cursor-pointer ${
+                  activeSection === 'camerasSection'
+                    ? 'bg-[#76FF03]/20 text-[#76FF03] border border-[#76FF03]/40'
+                    : 'bg-[#272727] text-[#e0e0e0] hover:bg-[#3f3f3f] border border-white/[0.06]'
+                }`}
+              >
+                <span className="material-icons">videocam</span>
+                <span>Cameras</span>
+              </button>
+            </div>
+
+            {/* Symmetrical FAQ Button at the Bottom on Mobile */}
+            <button
+              onClick={() => handleNavClick('faqSection')}
+              className={`jump-faq-bottom-btn transition-all duration-200 cursor-pointer ${
+                activeSection === 'faqSection'
+                  ? 'bg-[#76FF03]/20 text-[#76FF03] border border-[#76FF03]/40'
+                  : 'bg-[#212121] text-[#b0b0b0] hover:bg-[#2c2c2c] hover:text-white border border-white/[0.06]'
+              }`}
+            >
+              <span className="material-icons" style={{ fontSize: '15px' }}>help_outline</span>
+              <span>Frequently Asked Questions (FAQ)</span>
+            </button>
+          </div>
         </div>
       </section>
 
@@ -799,6 +864,38 @@ export const IssContentSections: React.FC<IssContentSectionsProps> = ({
             {
               q: 'What will happen to the ISS at the end of its life?',
               a: "NASA and international partners plan to safely deorbit the ISS in 2030–2031. SpaceX has been awarded a contract to build a specialized US Deorbit Vehicle to guide the station into Point Nemo, the remote Pacific spacecraft cemetery, ensuring zero hazard to populated areas.",
+            },
+            {
+              q: 'What is the Overview Effect?',
+              a: 'The Overview Effect is a profound cognitive shift reported by astronauts when viewing Earth from orbit. Witnessing our borderless, radiant planet suspended in the silent void of space instills deep feelings of awe, global unity, and an acute desire to protect humanity\'s only home.',
+            },
+            {
+              q: 'How do astronauts sleep in microgravity?',
+              a: 'Astronauts sleep inside soundproof, phone-booth-sized Crew Quarters strapped into sleeping bags anchored to walls. Continuous ventilation fans are vital — without active air circulation in zero gravity, carbon dioxide exhaled by sleeping astronauts would pool around their heads and cause suffocation.',
+            },
+            {
+              q: 'How does the ISS generate oxygen and recycle water?',
+              a: 'The Environmental Control and Life Support System (ECLSS) recovers roughly 98% of all station water from astronaut breath, sweat, and urine, purifying it beyond tap water standards. Oxygen is continuously produced via water electrolysis powered by the station\'s massive solar array wings.',
+            },
+            {
+              q: 'What time zone does the International Space Station use?',
+              a: 'Because the station experiences 16 sunrises and sunsets every 24 hours, local solar time is unusable. Instead, the ISS operates on Coordinated Universal Time (UTC/GMT), comfortably bridging communications between primary mission controls in Houston (UTC-5/6) and Moscow (UTC+3).',
+            },
+            {
+              q: 'How does the ISS avoid space debris and space junk?',
+              a: 'Global radar tracking monitors thousands of orbital debris fragments. If any object enters the station\'s protective safety envelope (roughly 25×25×4 km) with a collision probability exceeding 1 in 10,000, thrusters on docked spacecraft execute a Pre-Determined Debris Avoidance Maneuver (PDAM).',
+            },
+            {
+              q: 'How do astronauts take out the trash?',
+              a: 'Garbage and discarded equipment are packed into expendable cargo spacecraft like Northrop Grumman\'s Cygnus or Roscosmos\'s Progress once unloaded. When detached, these craft execute a targeted atmospheric reentry, vaporizing tons of waste safely over the southern Pacific Ocean.',
+            },
+            {
+              q: 'What happens during an emergency aboard the ISS?',
+              a: 'Crews drill relentlessly for the "Big Three" emergencies: fire, rapid cabin depressurization (hull breach), and toxic ammonia coolant leakage. Response protocols involve donning emergency masks, isolating compartments using hermetic hatches, and retreating to docked escape vehicles if needed.',
+            },
+            {
+              q: 'Do astronauts grow taller in space?',
+              a: 'Yes! Without gravity compressing the vertebrae, spinal discs expand, causing astronauts to grow up to 3% taller (around 5 cm or 2 inches) while in orbit. Their height gradually returns to normal over several months after returning to Earth.',
             },
           ].map((faq, i) => (
             <div key={i} className="content-card">
