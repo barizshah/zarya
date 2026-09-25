@@ -894,8 +894,8 @@ export const IssContentSections: React.FC<IssContentSectionsProps> = ({
               a: 'Crews drill relentlessly for the "Big Three" emergencies: fire, rapid cabin depressurization (hull breach), and toxic ammonia coolant leakage. Response protocols involve donning emergency masks, isolating compartments using hermetic hatches, and retreating to docked escape vehicles if needed.',
             },
             {
-              q: 'Do astronauts grow taller in space?',
-              a: 'Yes! Without gravity compressing the vertebrae, spinal discs expand, causing astronauts to grow up to 3% taller (around 5 cm or 2 inches) while in orbit. Their height gradually returns to normal over several months after returning to Earth.',
+              q: 'What is the ISS daily schedule and how do comms work?',
+              a: 'The ISS operates on UTC (GMT) with a structured timeline from 06:00 to 21:30 UTC, flanked by planning conferences with flight control. Astronauts balance research, maintenance, and 2 hours of mandatory exercise, using NASA\'s TDRSS satellites for Ku-band data and S-band voice loops.',
             },
           ].map((faq, i) => (
             <div key={i} className="content-card">
