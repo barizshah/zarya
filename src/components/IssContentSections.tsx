@@ -475,7 +475,7 @@ export const IssContentSections: React.FC<IssContentSectionsProps> = ({
           <span>Who is on the ISS</span>
         </h2>
         <p className="content-section-subtitle">
-          Expedition 73 astronauts and cosmonauts currently living and working aboard the orbital outpost.
+          Astronauts and cosmonauts currently living and working aboard the orbital outpost.
         </p>
         <div className="who-is-on-content" id="whoIsOnSectionContent">
           <div className="content-cards-grid">

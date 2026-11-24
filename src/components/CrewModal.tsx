@@ -10,12 +10,14 @@ interface CrewModalProps {
 
 const CRAFT_BADGE: Record<string, { label: string; color: string }> = {
   'Crew Dragon': { label: 'Crew Dragon', color: '#76FF03' },
+  'Crew-13': { label: 'Crew-13', color: '#76FF03' },
   'Crew-12': { label: 'Crew-12', color: '#76FF03' },
   'Soyuz': { label: 'Soyuz MS-29', color: '#4fc3f7' },
   'ISS': { label: 'ISS', color: '#aaaaaa' },
 };
 
 function getCraftBadge(craft: string): { label: string; color: string } {
+  if (craft.toLowerCase().includes('crew-13')) return CRAFT_BADGE['Crew-13'];
   if (craft.toLowerCase().includes('crew-12') || craft.toLowerCase().includes('endurance')) return CRAFT_BADGE['Crew-12'];
   if (craft.toLowerCase().includes('crew dragon')) return CRAFT_BADGE['Crew Dragon'];
   if (craft.toLowerCase().includes('soyuz')) return CRAFT_BADGE['Soyuz'];
@@ -72,10 +74,10 @@ export const CrewModal: React.FC<CrewModalProps> = ({ isOpen, onClose, crew }) =
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2 flex-wrap">
                 <h3 className="text-sm sm:text-base font-bold text-white font-mono leading-tight">
-                  ISS Expedition 73
+                  ISS Expedition Crew
                 </h3>
                 <span className="text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded bg-[#76FF03]/15 text-[#76FF03] border border-[#76FF03]/30">
-                  Exp. 73
+                  Exp. 75
                 </span>
               </div>
               <p className="text-[10.5px] sm:text-xs text-[#cccccc] truncate mt-0.5">
@@ -95,12 +97,12 @@ export const CrewModal: React.FC<CrewModalProps> = ({ isOpen, onClose, crew }) =
 
         {/* Modal Body with smooth momentum scrolling */}
         <div className="p-3 sm:p-5 overflow-y-auto space-y-4 sm:space-y-6 overscroll-contain">
-          {/* Crew Dragon / Crew-12 */}
+          {/* Crew Dragon / Commercial Crew */}
           {crewDragon.length > 0 && (
             <div>
               <div className="flex items-center justify-between mb-3">
                 <h4 className="text-xs font-mono uppercase tracking-wider font-semibold text-[#76FF03]">
-                  SpaceX Crew Dragon — Crew-12
+                  SpaceX Crew Dragon
                 </h4>
                 <span className="text-[11px] font-mono text-[#76FF03] bg-[#76FF03]/10 px-2 py-0.5 rounded border border-[#76FF03]/25">
                   {crewDragon.length} astronauts

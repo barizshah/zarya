@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { CameraId } from './IssNavbar';
 
 interface IssVideoPlayerProps {
@@ -20,7 +20,7 @@ const CAMERAS: Record<CameraId, CameraMetadata> = {
   hd: {
     title: 'NASA ISS Live — High Definition Earth Cam',
     subtitle: 'High Definition Views • Earth & Station',
-    youtubeId: 'awQzjn72bI0',
+    youtubeId: 'ROboUHfPUrU',
   },
   sd: {
     title: 'NASA ISS Live — SD Camera & Mission Audio',
@@ -34,17 +34,26 @@ export const IssVideoPlayer: React.FC<IssVideoPlayerProps> = ({
 }) => {
   const [isLoading, setIsLoading] = useState(true);
 
+  // Reset loading state when active camera changes
+  useEffect(() => {
+    setIsLoading(true);
+  }, [activeCamera]);
+
   const currentCam = CAMERAS[activeCamera] || CAMERAS['4k'];
 
   return (
     <div className="video-player select-none">
       <div className="video-container relative w-full h-full bg-[#000000] overflow-hidden" id="videoContainer">
         {isLoading && (
-          <div className="video-overlay loading absolute inset-0 flex items-center justify-center bg-[#000000] z-10 transition-opacity duration-300" id="videoOverlay">
+          <div
+            className="video-overlay loading absolute inset-0 flex items-center justify-center bg-[#000000] z-10 transition-opacity duration-300 pointer-events-none"
+            id="videoOverlay"
+          >
             <div className="loading-spinner-large" />
           </div>
         )}
 
+        {/* Only mount single active camera iframe to avoid background streaming/resource usage */}
         <iframe
           key={activeCamera}
           className="video-iframe w-full h-full border-0"

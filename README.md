@@ -37,18 +37,18 @@ No app install. No sign-up. Just open it and watch the ISS fly over you in real 
 
 ## 🛰️ Features
 
-| Feature | Details |
-|---|---|
-| 📡 **Live Telemetry** | Altitude, velocity, lat/lon, visibility, and overhead region — refreshed every 4 seconds |
-| 🌦️ **ISS Surface Weather** | Live surface weather (temperature, cloud cover %, conditions) directly beneath the ISS via Open-Meteo |
-| 🗺️ **ESA Orbital Tracker** | Live precision ground track with day/night terminator via European Space Agency's ISS tracker |
-| 📺 **Multi-feed Live Video** | Switch seamlessly between Sen 4K Ultra HD, NASA HD, and NASA SD mission audio feeds |
+| Feature                         | Details                                                                                                                                                           |
+| ------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 📡 **Live Telemetry**           | Altitude, velocity, lat/lon, visibility, and overhead region — refreshed every 4 seconds                                                                          |
+| 🌦️ **ISS Surface Weather**     | Live surface weather (temperature, cloud cover %, conditions) directly beneath the ISS via Open-Meteo                                                             |
+| 🗺️ **ESA Orbital Tracker**     | Live precision ground track with day/night terminator via European Space Agency's ISS tracker                                                                     |
+| 📺 **Multi-feed Live Video**    | Switch seamlessly between Sen 4K Ultra HD, NASA HD, and NASA SD mission audio feeds                                                                               |
 | 🌍 **3-Point Pass Predictions** | Precision flyover times with 3-point trajectory (start, culmination peak, departure), visual magnitude (`-3.5 mag Brilliant`), and daylight vs twilight filtering |
-| 🧑‍🚀 **Crew Manifest** | Expedition 73 astronaut cards with portraits, agencies, roles, bios, and days-in-space counters |
-| 🚀 **Launch Schedule** | Upcoming orbital rocket launches from Launch Library 2 with automatic fallback |
-| 🏢 **Launch Sites** | Major spaceports and orbital launch complexes worldwide |
-| 🏛️ **Space Agencies** | NASA, ESA, Roscosmos, JAXA, CSA, ISRO, and more |
-| ❓ **FAQ & Overpass Facts** | In-depth answers about the ISS and dynamic educational facts contextualized to current ground track |
+| 🧑‍🚀 **Crew Manifest**         | Live ISS expedition astronaut cards with portraits, agencies, roles, bios, and days-in-space counters |
+| 🚀 **Launch Schedule**          | Upcoming orbital rocket launches from Launch Library 2 with automatic fallback                                                                                    |
+| 🏢 **Launch Sites**             | Major spaceports and orbital launch complexes worldwide                                                                                                           |
+| 🏛️ **Space Agencies**          | NASA, ESA, Roscosmos, JAXA, CSA, ISRO, and more                                                                                                                   |
+| ❓ **FAQ & Overpass Facts**      | In-depth answers about the ISS and dynamic educational facts contextualized to current ground track                                                               |
 
 ---
 

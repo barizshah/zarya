@@ -17,7 +17,7 @@ const FEEDS: FeedConfig[] = [
     id: 'nasa-cam-1',
     sourceKey: 'hd',
     title: 'NASA Cam 1: Earth HD',
-    youtubeId: 'M3HKLzjvKPc',
+    youtubeId: 'ROboUHfPUrU',
     topBadge: { text: 'HS', color: 'bg-amber-400' },
     bottomBadge: { text: 'HD', color: 'bg-emerald-400' },
     // Earth from space thumbnail matching Card 1 in mockup
@@ -27,7 +27,7 @@ const FEEDS: FeedConfig[] = [
     id: 'nasa-cam-2',
     sourceKey: 'sd',
     title: 'NASA Cam 2: Ops & Audio',
-    youtubeId: 'awQzjn72bI0',
+    youtubeId: 'M3HKLzjvKPc',
     topBadge: { text: 'ISS', color: 'bg-emerald-400' },
     bottomBadge: { text: 'T3', color: 'bg-emerald-400' },
     // ISS module and robotic arm thumbnail matching Card 2 in mockup

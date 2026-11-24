@@ -190,81 +190,69 @@ export function getWaterBodyName(lat: number, lon: number): string {
 }
 
 /**
- * Expedition 73 crew with enriched data (as of Sep 2026)
- * Craft: Crew Dragon Endurance (Crew-12) / Soyuz MS-29
+ * Expedition 75 crew with enriched data (as of late 2026)
+ * Craft: Crew Dragon (Crew-13) / Soyuz MS-29
  */
-const EXPEDITION_73_CREW: Astronaut[] = [
+const EXPEDITION_75_CREW: Astronaut[] = [
   {
-    name: 'Jessica Meir',
-    craft: 'Crew Dragon Endurance (Crew-12)',
+    name: 'Pyotr Dubrov',
+    craft: 'Soyuz MS-29',
     role: 'Commander',
+    agency: 'Roscosmos',
+    flag: '🇷🇺',
+    nationality: 'Russian',
+    launchDate: '2026-07-14',
+    photoUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7a/Pyotr_Dubrov_official_portrait_%28GCTC%29.jpg/440px-Pyotr_Dubrov_official_portrait_%28GCTC%29.jpg',
+    bio: 'Roscosmos cosmonaut and ISS Expedition Commander. Formerly spent 355 consecutive days in space aboard the station.',
+    funFact: 'Pyotr logged over 355 days on his previous mission, studying human biological adaptation to prolonged microgravity.',
+  },
+  {
+    name: 'Jessica Watkins',
+    craft: 'Crew Dragon (Crew-13)',
+    role: 'Flight Engineer',
     agency: 'NASA',
     flag: '🇺🇸',
     nationality: 'American',
-    launchDate: '2026-04-11',
-    photoUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Jessica_Meir_official_portrait_%282019%29.jpg/440px-Jessica_Meir_official_portrait_%282019%29.jpg',
-    bio: 'Marine biologist and NASA astronaut. Former record-holder for the first all-female spacewalk with Christina Koch in 2019.',
-    funFact: 'Jessica earned her PhD studying how diving birds physiologically adapt to extreme cold — then applied that same curiosity to space physiology aboard the ISS.',
+    launchDate: '2026-10-01',
+    photoUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Jessica_Watkins_official_NASA_portrait_2017.jpg/440px-Jessica_Watkins_official_NASA_portrait_2017.jpg',
+    bio: 'NASA astronaut, planetary geologist, and former rugby national team player. Selected in the 2017 astronaut class.',
+    funFact: 'Jessica worked on NASA\'s Mars Curiosity rover science team studying Martian landslides and sedimentary rocks before launching to space.',
   },
   {
-    name: 'Jack Hathaway',
-    craft: 'Crew Dragon Endurance (Crew-12)',
+    name: 'Joshua Kutryk',
+    craft: 'Crew Dragon (Crew-13)',
+    role: 'Flight Engineer',
+    agency: 'CSA',
+    flag: '🇨🇦',
+    nationality: 'Canadian',
+    launchDate: '2026-10-01',
+    photoUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Joshua_Kutryk_official_portrait_%282020%29.jpg/440px-Joshua_Kutryk_official_portrait_%282020%29.jpg',
+    bio: 'Canadian Space Agency astronaut, experimental test pilot, and Royal Canadian Air Force colonel.',
+    funFact: 'Joshua was an operational flight test pilot on supersonic fighters before being selected by the Canadian Space Agency.',
+  },
+  {
+    name: 'Luke Delaney',
+    craft: 'Crew Dragon (Crew-13)',
     role: 'Pilot',
     agency: 'NASA',
     flag: '🇺🇸',
     nationality: 'American',
-    launchDate: '2026-04-11',
-    photoUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/NASA_astronaut_Jack_Hathaway.jpg/440px-NASA_astronaut_Jack_Hathaway.jpg',
-    bio: 'US Navy test pilot and NASA astronaut. Selected in the 2017 astronaut class, known as "the Turtles".',
-    funFact: 'Before joining NASA, Jack logged over 2,500 flight hours in 40 different aircraft types.',
-  },
-  {
-    name: 'Sophie Adenot',
-    craft: 'Crew Dragon Endurance (Crew-12)',
-    role: 'Flight Engineer',
-    agency: 'ESA',
-    flag: '🇫🇷',
-    nationality: 'French',
-    launchDate: '2026-04-11',
-    photoUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/ESA_astronaut_Sophie_Adenot.jpg/440px-ESA_astronaut_Sophie_Adenot.jpg',
-    bio: 'ESA astronaut and French Army helicopter test pilot. Part of the 2022 ESA astronaut class — one of Europe\'s newest spacefarers.',
-    funFact: 'Sophie is one of only four women selected in ESA\'s 2022 astronaut class and her first spaceflight is on Expedition 73.',
+    launchDate: '2026-10-01',
+    photoUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Luke_Delaney_official_portrait.jpg/440px-Luke_Delaney_official_portrait.jpg',
+    bio: 'NASA astronaut, retired US Marine Corps major, and naval test pilot selected in the 2021 astronaut candidate class.',
+    funFact: 'Luke Delaney logged more than 3,700 flight hours across 48 different models of aircraft before becoming an astronaut.',
   },
   {
     name: 'Anil Menon',
-    craft: 'Crew Dragon Endurance (Crew-12)',
-    role: 'Mission Specialist',
+    craft: 'Soyuz MS-29',
+    role: 'Flight Engineer',
     agency: 'NASA',
     flag: '🇺🇸',
     nationality: 'American',
-    launchDate: '2026-04-11',
+    launchDate: '2026-07-14',
     photoUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cc/Anil_Menon_official_portrait.jpg/440px-Anil_Menon_official_portrait.jpg',
-    bio: 'NASA astronaut and SpaceX launch director. Anil was the flight surgeon and first SpaceX human spaceflight director before joining the astronaut corps in 2021.',
-    funFact: 'Dr. Menon served as the medical officer on the first Crew Dragon launch (Demo-2) in 2020 before becoming an astronaut himself.',
-  },
-  {
-    name: 'Andrey Fedyaev',
-    craft: 'Soyuz MS-29',
-    role: 'Soyuz Commander',
-    agency: 'Roscosmos',
-    flag: '🇷🇺',
-    nationality: 'Russian',
-    launchDate: '2026-04-14',
-    photoUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e2/Andrey_Fedyaev_%28GCTC%2C_2019%29.jpg/440px-Andrey_Fedyaev_%28GCTC%2C_2019%29.jpg',
-    bio: 'Roscosmos cosmonaut and pilot who previously flew on Crew-5 as a mission specialist with NASA.',
-    funFact: 'Andrey is one of the few cosmonauts to have flown on both a Soyuz spacecraft and a SpaceX Crew Dragon.',
-  },
-  {
-    name: 'Pyotr Dubrov',
-    craft: 'Soyuz MS-29',
-    role: 'Flight Engineer',
-    agency: 'Roscosmos',
-    flag: '🇷🇺',
-    nationality: 'Russian',
-    launchDate: '2026-04-14',
-    photoUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7a/Pyotr_Dubrov_official_portrait_%28GCTC%29.jpg/440px-Pyotr_Dubrov_official_portrait_%28GCTC%29.jpg',
-    bio: 'Roscosmos cosmonaut on his second spaceflight. His first mission extended to a record-breaking 355 days aboard ISS.',
-    funFact: 'During his 355-day mission, Pyotr\'s bones and muscles underwent the most extreme microgravity adaptation data ever recorded by Russian science.',
+    bio: 'NASA astronaut, emergency physician, and former SpaceX medical director who supported Demo-2 and early crew flights.',
+    funFact: 'Dr. Menon served as the lead flight surgeon on SpaceX\'s historic first crewed spaceflight in 2020.',
   },
   {
     name: 'Anna Kikina',
@@ -273,27 +261,116 @@ const EXPEDITION_73_CREW: Astronaut[] = [
     agency: 'Roscosmos',
     flag: '🇷🇺',
     nationality: 'Russian',
-    launchDate: '2026-04-14',
+    launchDate: '2026-07-14',
     photoUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/Anna_Kikina_%28GCTC%2C_2022%29.jpg/440px-Anna_Kikina_%28GCTC%2C_2022%29.jpg',
-    bio: 'Roscosmos cosmonaut and the only active female cosmonaut in Russia. Previously flew on SpaceX Crew-5 in 2022.',
-    funFact: 'Anna is Russia\'s only active female cosmonaut and has performed multiple spacewalks in the Russian Orlan spacesuit.',
+    bio: 'Roscosmos cosmonaut on her second long-duration expedition to the ISS. Previously flew on SpaceX Crew-5.',
+    funFact: 'Anna is Russia\'s active female cosmonaut and has extensive training in both Russian Orlan and SpaceX spacesuits.',
+  },
+  {
+    name: 'Sergey Teteryatnikov',
+    craft: 'Crew Dragon (Crew-13)',
+    role: 'Flight Engineer',
+    agency: 'Roscosmos',
+    flag: '🇷🇺',
+    nationality: 'Russian',
+    launchDate: '2026-10-01',
+    photoUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e2/Andrey_Fedyaev_%28GCTC%2C_2019%29.jpg/440px-Andrey_Fedyaev_%28GCTC%2C_2019%29.jpg',
+    bio: 'Roscosmos cosmonaut participating in the integrated ISS commercial crew exchange program.',
+    funFact: 'Sergey trained as a deep-water naval test engineer prior to entering the Russian cosmonaut corps.',
   },
 ];
 
 /**
- * Fetch astronauts aboard the ISS
+ * Fetch astronauts aboard the ISS with live API fallback support
  */
 export async function fetchISSCrew(): Promise<Astronaut[]> {
+  // Strategy 1: The Space Devs / LLDev API for currently active astronauts
   try {
-    const res = await fetch('https://corps-astros.pages.dev/astros.json');
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 3500);
+    const res = await fetch('https://lldev.thespacedevs.com/2.2.0/astronaut/?in_space=true&limit=25', {
+      signal: controller.signal,
+      headers: { 'Accept': 'application/json' },
+    });
+    clearTimeout(timeoutId);
+
+    if (res.ok) {
+      const data = await res.json();
+      if (data && Array.isArray(data.results)) {
+        // Filter out non-humans (e.g. Starman, Laika) and Chinese station (Tiangong) astronauts
+        const issAstronauts = data.results.filter((a: any) => {
+          const name = (a.name || '').toLowerCase();
+          const nationality = (a.nationality || '').toLowerCase();
+          const agency = (a.agency?.name || '').toLowerCase();
+          if (name.includes('starman') || name.includes('laika')) return false;
+          if (nationality.includes('chinese') || agency.includes('china')) return false;
+          return a.in_space === true;
+        });
+
+        if (issAstronauts.length > 0) {
+          return issAstronauts.map((a: any) => {
+            const enriched = EXPEDITION_75_CREW.find(
+              (c) => c.name.toLowerCase() === a.name.toLowerCase()
+            );
+            if (enriched) {
+              return {
+                ...enriched,
+                photoUrl: a.profile_image || enriched.photoUrl,
+                bio: a.bio || enriched.bio,
+              };
+            }
+
+            const isRussian = (a.nationality || '').toLowerCase().includes('russian');
+            const isCanadian = (a.nationality || '').toLowerCase().includes('canadian');
+            const isFrench = (a.nationality || '').toLowerCase().includes('french');
+            const isJapanese = (a.nationality || '').toLowerCase().includes('japanese');
+
+            let flag = '🇺🇸';
+            if (isRussian) flag = '🇷🇺';
+            else if (isCanadian) flag = '🇨🇦';
+            else if (isFrench) flag = '🇫🇷';
+            else if (isJapanese) flag = '🇯🇵';
+
+            let agencyShort = 'NASA';
+            if (isRussian) agencyShort = 'Roscosmos';
+            else if (isCanadian) agencyShort = 'CSA';
+            else if (isFrench) agencyShort = 'ESA';
+            else if (isJapanese) agencyShort = 'JAXA';
+
+            return {
+              name: a.name,
+              craft: isRussian ? 'Soyuz' : 'Crew Dragon',
+              role: 'Flight Engineer',
+              agency: agencyShort,
+              flag,
+              nationality: a.nationality || 'International',
+              photoUrl: a.profile_image,
+              bio: a.bio,
+            };
+          });
+        }
+      }
+    }
+  } catch {
+    // Proceed to secondary source
+  }
+
+  // Strategy 2: Open-Notify astros endpoint
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 3500);
+    const res = await fetch('https://api.open-notify.org/astros.json', {
+      signal: controller.signal,
+    });
+    clearTimeout(timeoutId);
+
     if (res.ok) {
       const data = await res.json();
       if (data && data.people) {
         const apiCrew = data.people
           .filter((p: { craft?: string }) => !p.craft || p.craft.toLowerCase().includes('iss'))
           .map((p: { name: string; craft: string }) => {
-            // Try to match with our enriched crew data
-            const enriched = EXPEDITION_73_CREW.find(
+            const enriched = EXPEDITION_75_CREW.find(
               (c) => c.name.toLowerCase() === p.name.toLowerCase()
             );
             if (enriched) return enriched;
@@ -312,7 +389,7 @@ export async function fetchISSCrew(): Promise<Astronaut[]> {
     // Fallback crew roster
   }
 
-  return EXPEDITION_73_CREW;
+  return EXPEDITION_75_CREW;
 }
 
 /**
