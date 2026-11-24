@@ -416,13 +416,41 @@ export async function searchLocation(query: string): Promise<NominatimResult[]> 
 }
 
 /**
- * Fetch upcoming orbital rocket launches from Launch Library 2 API with fallback data
+ * Fetch upcoming orbital rocket launches with multi-tier real-time sources & localStorage caching
  */
-export async function fetchUpcomingLaunches(): Promise<import('../types/iss').RocketLaunch[]> {
+const LAUNCHES_CACHE_KEY = 'zarya_upcoming_launches_cache_v1';
+const LAUNCHES_CACHE_TTL = 15 * 60 * 1000; // 15 minutes TTL
+
+export async function fetchUpcomingLaunches(forceRefresh = false): Promise<import('../types/iss').RocketLaunch[]> {
+  const now = Date.now();
+
+  // Tier 1: Check client-side cached data if fresh and not forced
+  if (!forceRefresh && typeof window !== 'undefined' && window.localStorage) {
+    try {
+      const cachedRaw = localStorage.getItem(LAUNCHES_CACHE_KEY);
+      if (cachedRaw) {
+        const cached = JSON.parse(cachedRaw);
+        if (cached && cached.timestamp && (now - cached.timestamp < LAUNCHES_CACHE_TTL) && Array.isArray(cached.data) && cached.data.length > 0) {
+          // Filter out launches that already completed more than 1 hour ago
+          const validLaunches = cached.data.filter((l: import('../types/iss').RocketLaunch) => {
+            const launchTime = new Date(l.net).getTime();
+            return !isNaN(launchTime) && (launchTime > now - 3600 * 1000);
+          });
+          if (validLaunches.length > 0) {
+            return validLaunches;
+          }
+        }
+      }
+    } catch (e) {
+      console.warn('Error reading launch cache:', e);
+    }
+  }
+
+  // Tier 2: Primary Live API — Launch Library 2 Production (ll.thespacedevs.com)
   try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 3500);
-    const res = await fetch('https://lldev.thespacedevs.com/2.2.0/launch/upcoming/?limit=6', {
+    const timeoutId = setTimeout(() => controller.abort(), 4000);
+    const res = await fetch('https://ll.thespacedevs.com/2.2.0/launch/upcoming/?limit=8', {
       signal: controller.signal,
       headers: { 'Accept': 'application/json' },
     });
@@ -431,7 +459,7 @@ export async function fetchUpcomingLaunches(): Promise<import('../types/iss').Ro
     if (res.ok) {
       const data = await res.json();
       if (data && data.results && data.results.length > 0) {
-        return data.results.map((item: any) => ({
+        const parsed: import('../types/iss').RocketLaunch[] = data.results.map((item: any) => ({
           id: item.id || String(Math.random()),
           name: item.name || 'Orbital Launch',
           missionName: item.mission?.name || item.name || 'Satellite Deployment',
@@ -444,20 +472,78 @@ export async function fetchUpcomingLaunches(): Promise<import('../types/iss').Ro
           description: item.mission?.description || 'Orbital mission delivering science and satellite payloads to low Earth orbit.',
           imageUrl: item.image || undefined,
         }));
+
+        if (typeof window !== 'undefined' && window.localStorage) {
+          try {
+            localStorage.setItem(LAUNCHES_CACHE_KEY, JSON.stringify({ timestamp: now, data: parsed }));
+          } catch {}
+        }
+        return parsed;
       }
     }
   } catch (err) {
-    console.warn('Launch Library live fetch fallback:', err);
+    console.warn('Launch Library 2 production fetch attempt failed, trying RocketLaunch.live fallback...', err);
   }
 
-  // Fallback upcoming orbital launches schedule
-  const now = Date.now();
-  return [
+  // Tier 3: Secondary Live API — RocketLaunch.live
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 3500);
+    const res = await fetch('https://fdo.rocketlaunch.live/json/launches/next/5', {
+      signal: controller.signal,
+      headers: { 'Accept': 'application/json' },
+    });
+    clearTimeout(timeoutId);
+
+    if (res.ok) {
+      const data = await res.json();
+      if (data && Array.isArray(data.result) && data.result.length > 0) {
+        const parsed: import('../types/iss').RocketLaunch[] = data.result.map((item: any) => {
+          // Format ISO time from win_open or t0 timestamp
+          let netTime = '';
+          if (item.win_open) {
+            netTime = new Date(item.win_open).toISOString();
+          } else if (item.t0) {
+            netTime = new Date(item.t0).toISOString();
+          } else if (item.sort_date) {
+            netTime = new Date(item.sort_date * 1000).toISOString();
+          } else {
+            netTime = new Date(now + 24 * 3600 * 1000).toISOString();
+          }
+
+          return {
+            id: String(item.id || Math.random()),
+            name: item.name || `${item.vehicle?.name || 'Rocket'} | ${item.missions?.[0]?.name || 'Mission'}`,
+            missionName: item.missions?.[0]?.name || item.name || 'Orbital Mission',
+            net: netTime,
+            rocketName: item.vehicle?.name || 'Launch Vehicle',
+            provider: item.provider?.name || 'Launch Operator',
+            padName: item.pad?.name || 'Launch Pad',
+            locationName: item.pad?.location?.name || 'Orbital Spaceport',
+            status: item.launch_status || 'Go for Launch',
+            description: item.launch_description || item.missions?.[0]?.description || 'Spaceflight mission delivering payloads into Earth orbit.',
+          };
+        });
+
+        if (typeof window !== 'undefined' && window.localStorage) {
+          try {
+            localStorage.setItem(LAUNCHES_CACHE_KEY, JSON.stringify({ timestamp: now, data: parsed }));
+          } catch {}
+        }
+        return parsed;
+      }
+    }
+  } catch (err) {
+    console.warn('RocketLaunch.Live fallback attempt failed, falling back to curated manifest...', err);
+  }
+
+  // Tier 4: Curated near-term realistic launch manifest fallback
+  const curatedManifest: import('../types/iss').RocketLaunch[] = [
     {
-      id: 'f9-starlink',
+      id: 'f9-starlink-g',
       name: 'Falcon 9 Block 5 | Starlink Group',
       missionName: 'Starlink Broadband Constellation',
-      net: new Date(now + 14 * 3600 * 1000).toISOString(),
+      net: new Date(now + 18 * 3600 * 1000).toISOString(),
       rocketName: 'Falcon 9 Block 5',
       provider: 'SpaceX',
       padName: 'Space Launch Complex 40',
@@ -467,23 +553,36 @@ export async function fetchUpcomingLaunches(): Promise<import('../types/iss').Ro
       imageUrl: 'https://images-assets.nasa.gov/image/KSC-20200530-PH-SPX01_0001/KSC-20200530-PH-SPX01_0001~large.jpg',
     },
     {
+      id: 'f9-ng25-resupply',
+      name: 'Falcon 9 Block 5 | Cygnus NG-25',
+      missionName: 'Northrop Grumman CRS-25 ISS Resupply',
+      net: new Date(now + 112 * 3600 * 1000).toISOString(),
+      rocketName: 'Falcon 9 Block 5',
+      provider: 'SpaceX / Northrop Grumman',
+      padName: 'Space Launch Complex 40',
+      locationName: 'Cape Canaveral SFS, FL, USA',
+      status: 'Go for Launch',
+      description: 'Cygnus spacecraft transporting 3,700+ kg of vital supplies, science experiments, and habitat equipment to the ISS crew.',
+      imageUrl: 'https://images-assets.nasa.gov/image/iss064e004546/iss064e004546~large.jpg',
+    },
+    {
       id: 'f9-crew',
-      name: 'Falcon 9 Block 5 | NASA Commercial Crew',
+      name: 'Falcon 9 Block 5 | Commercial Crew Rotation',
       missionName: 'ISS Expedition Crew Rotation',
-      net: new Date(now + 48 * 3600 * 1000).toISOString(),
+      net: new Date(now + 180 * 3600 * 1000).toISOString(),
       rocketName: 'Falcon 9 Block 5',
       provider: 'SpaceX / NASA',
       padName: 'Launch Complex 39A',
       locationName: 'Kennedy Space Center, FL, USA',
       status: 'Go for Launch',
-      description: 'Crew Dragon spacecraft transporting NASA and international partner astronauts to the ISS for a 6-month science expedition.',
+      description: 'Crew Dragon spacecraft transporting NASA and international partner astronauts to the ISS for an orbital science expedition.',
       imageUrl: 'https://images-assets.nasa.gov/image/iss064e004546/iss064e004546~large.jpg',
     },
     {
-      id: 'soyuz-progress',
-      name: 'Soyuz-2.1a | Progress MS Resupply',
-      missionName: 'ISS Cargo Resupply',
-      net: new Date(now + 96 * 3600 * 1000).toISOString(),
+      id: 'soyuz-progress-cargo',
+      name: 'Soyuz-2.1a | Progress MS Cargo',
+      missionName: 'ISS Autonomous Resupply',
+      net: new Date(now + 260 * 3600 * 1000).toISOString(),
       rocketName: 'Soyuz-2.1a',
       provider: 'Roscosmos',
       padName: 'Site 31/6',
@@ -496,7 +595,7 @@ export async function fetchUpcomingLaunches(): Promise<import('../types/iss').Ro
       id: 'electron-commercial',
       name: 'Electron | Dedicated Smallsat Mission',
       missionName: 'Earth Observation Radar CubeSats',
-      net: new Date(now + 140 * 3600 * 1000).toISOString(),
+      net: new Date(now + 340 * 3600 * 1000).toISOString(),
       rocketName: 'Electron',
       provider: 'Rocket Lab',
       padName: 'Launch Complex 1A',
@@ -505,6 +604,8 @@ export async function fetchUpcomingLaunches(): Promise<import('../types/iss').Ro
       description: 'Dedicated commercial rideshare launch deploying radar observation satellites into sun-synchronous orbit.',
     },
   ];
+
+  return curatedManifest;
 }
 
 /**

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, MapPin, Building2, Timer } from 'lucide-react';
+import { Calendar, MapPin, Building2, Timer, RefreshCw } from 'lucide-react';
 import type { RocketLaunch } from '../types/iss';
 import { fetchUpcomingLaunches } from '../services/issApi';
 
@@ -9,35 +9,90 @@ const BORDER = 'rgba(255,255,255,0.08)';
 export const LaunchesSection: React.FC = () => {
   const [launches, setLaunches] = useState<RocketLaunch[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [refreshing, setRefreshing] = useState<boolean>(false);
   const [now, setNow] = useState<number>(() => Date.now());
 
+  const loadData = async (force = false) => {
+    if (force) setRefreshing(true);
+    try {
+      const data = await fetchUpcomingLaunches(force);
+      setLaunches(data);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
+
   useEffect(() => {
-    fetchUpcomingLaunches().then((data) => { setLaunches(data); setLoading(false); });
+    loadData(false);
     const interval = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(interval);
   }, []);
 
   const getCountdown = (targetNet: string) => {
-    const diff = new Date(targetNet).getTime() - now;
-    if (diff <= 0) return { days: 0, hours: 0, mins: 0, secs: 0, isPast: true };
+    const targetMs = new Date(targetNet).getTime();
+    if (isNaN(targetMs)) {
+      return { days: 0, hours: 0, mins: 0, secs: 0, isPast: false, isTBD: true };
+    }
+    const diff = targetMs - now;
+    if (diff <= 0) {
+      const elapsed = Math.abs(diff);
+      const elapsedMins = Math.floor(elapsed / (1000 * 60));
+      return {
+        days: 0,
+        hours: 0,
+        mins: 0,
+        secs: 0,
+        isPast: true,
+        isTBD: false,
+        elapsedText: elapsedMins < 60 ? `T+${elapsedMins}m (IN FLIGHT)` : 'LIFTOFF COMPLETED'
+      };
+    }
     return {
       days: Math.floor(diff / (1000 * 60 * 60 * 24)),
       hours: Math.floor((diff / (1000 * 60 * 60)) % 24),
       mins: Math.floor((diff / (1000 * 60)) % 60),
       secs: Math.floor((diff / 1000) % 60),
       isPast: false,
+      isTBD: false,
     };
   };
 
   return (
     <section className="content-section" id="launchesSection">
-      <h2 className="content-section-title">
-        <span className="material-icons">rocket_launch</span>
-        <span>Upcoming Rocket Launches</span>
-      </h2>
-      <p className="content-section-subtitle">
-        Real-time orbital launch manifest and live countdown clocks for upcoming missions delivering payloads, cargo, and astronauts to space.
-      </p>
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px', marginBottom: '16px' }}>
+        <div>
+          <h2 className="content-section-title" style={{ margin: 0 }}>
+            <span className="material-icons">rocket_launch</span>
+            <span>Upcoming Rocket Launches</span>
+          </h2>
+          <p className="content-section-subtitle" style={{ margin: '6px 0 0 0' }}>
+            Real-time orbital launch manifest and live countdown clocks for upcoming missions delivering payloads, cargo, and astronauts to space.
+          </p>
+        </div>
+        <button
+          onClick={() => loadData(true)}
+          disabled={loading || refreshing}
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '6px',
+            padding: '6px 14px',
+            background: 'rgba(255,255,255,0.05)',
+            border: `1px solid ${BORDER}`,
+            borderRadius: '6px',
+            color: '#ffffff',
+            fontSize: '12px',
+            fontWeight: 600,
+            cursor: loading || refreshing ? 'not-allowed' : 'pointer',
+            transition: 'all 0.2s ease',
+          }}
+          title="Force fresh sync with launch manifest providers"
+        >
+          <RefreshCw style={{ width: '13px', height: '13px', color: GREEN, animation: refreshing ? 'spin 1s linear infinite' : 'none' }} />
+          <span>{refreshing ? 'Syncing...' : 'Sync Manifest'}</span>
+        </button>
+      </div>
 
       {loading ? (
         <div className="info-card-label" style={{ padding: '32px', textAlign: 'center' }}>
@@ -47,10 +102,18 @@ export const LaunchesSection: React.FC = () => {
         <div className="content-cards-grid">
           {launches.map((launch) => {
             const countdown = getCountdown(launch.net);
-            const launchDate = new Date(launch.net).toLocaleDateString(undefined, {
+            const parsedDate = new Date(launch.net);
+            const isValidDate = !isNaN(parsedDate.getTime());
+            
+            const launchDateLocal = isValidDate ? parsedDate.toLocaleDateString(undefined, {
               month: 'short', day: 'numeric', year: 'numeric',
               hour: '2-digit', minute: '2-digit', hour12: false, timeZoneName: 'short',
-            });
+            }) : 'TBD';
+
+            const launchDateUTC = isValidDate ? parsedDate.toLocaleDateString('en-US', {
+              month: 'short', day: 'numeric',
+              hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'UTC'
+            }) + ' UTC' : '';
 
             return (
               <div key={launch.id} className="info-card" style={{ padding: 0, overflow: 'hidden', justifyContent: 'space-between' }}>
@@ -82,7 +145,9 @@ export const LaunchesSection: React.FC = () => {
                   <div style={{ paddingTop: '8px', borderTop: `1px solid ${BORDER}`, display: 'flex', flexDirection: 'column', gap: '4px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
                       <Calendar style={{ width: '12px', height: '12px', color: GREEN }} />
-                      <span className="info-card-label">{launchDate}</span>
+                      <span className="info-card-label">
+                        {launchDateLocal} {launchDateUTC ? `(${launchDateUTC})` : ''}
+                      </span>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
                       <MapPin style={{ width: '12px', height: '12px', color: GREEN }} />
@@ -95,10 +160,14 @@ export const LaunchesSection: React.FC = () => {
                 <div style={{ padding: '10px 16px', background: '#131313', borderTop: `1px solid ${BORDER}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
                     <Timer style={{ width: '12px', height: '12px', color: GREEN }} />
-                    <span className="info-card-label">T-MINUS</span>
+                    <span className="info-card-label">{countdown.isPast ? 'STATUS' : 'T-MINUS'}</span>
                   </div>
-                  {countdown.isPast ? (
-                    <span className="info-card-description">LIFTOFF OCCURRED</span>
+                  {countdown.isTBD ? (
+                    <span className="info-card-description">TARGET DATE TBD</span>
+                  ) : countdown.isPast ? (
+                    <span className="info-card-description" style={{ color: '#ffb74d', fontWeight: 600 }}>
+                      {countdown.elapsedText || 'LIFTOFF OCCURRED'}
+                    </span>
                   ) : (
                     <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontFamily: 'JetBrains Mono, monospace', color: GREEN, fontSize: '12px', fontWeight: 700 }}>
                       {[`${countdown.days}d`, `${String(countdown.hours).padStart(2,'0')}h`, `${String(countdown.mins).padStart(2,'0')}m`, `${String(countdown.secs).padStart(2,'0')}s`].map((seg, i) => (
