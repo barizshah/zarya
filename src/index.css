@@ -342,13 +342,13 @@ body {
 
   /* Telemetry info section spacing */
   .info-section {
-    margin-top: 14px !important;
-    margin-bottom: 12px !important;
+    margin-top: 8px !important;
+    margin-bottom: 8px !important;
   }
 
-  /* Push Orbital Overpass Fact below the initial fold on larger screens */
+  /* Keep Orbital Overpass Fact seamlessly on the first page on desktop & larger screens */
   .overpass-fact-card {
-    margin-top: clamp(96px, 16vh, 180px) !important;
+    margin-top: 4px !important;
   }
 }
 

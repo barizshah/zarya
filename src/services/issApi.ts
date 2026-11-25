@@ -6,6 +6,21 @@ const WHERETHEISS_BASE = 'https://api.wheretheiss.at/v1';
 // Fallback: SGP orbital propagation cloud function endpoint
 const SGP_ENDPOINT = 'https://us-central1-iss-hd-live-android.cloudfunctions.net/getISSPositionSGPEndpoint';
 
+const regionDisplayNames =
+  typeof Intl !== 'undefined' && typeof Intl.DisplayNames === 'function'
+    ? new Intl.DisplayNames(['en'], { type: 'region' })
+    : null;
+
+function resolveCountryName(countryCode: string): string {
+  const normalized = countryCode.trim().toUpperCase();
+  if (!normalized) return countryCode;
+  try {
+    return regionDisplayNames?.of(normalized) || normalized;
+  } catch {
+    return normalized;
+  }
+}
+
 /**
  * Fetch current ISS position with fallback redundancy
  */
@@ -42,7 +57,12 @@ export async function fetchISSPosition(): Promise<ISSPosition> {
           const geoData = await geoRes.json();
           if (geoData.country_code && geoData.country_code !== '??') {
             countryCode = geoData.country_code;
-            locationName = geoData.name || `Over ${countryCode}`;
+            const fullCountryName = resolveCountryName(countryCode);
+            const rawName = typeof geoData.name === 'string' ? geoData.name.trim() : '';
+            locationName =
+              rawName && rawName.toUpperCase() !== countryCode.toUpperCase()
+                ? rawName
+                : `Over ${fullCountryName}`;
           }
         }
       } catch {
