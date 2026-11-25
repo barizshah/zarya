@@ -346,9 +346,9 @@ body {
     margin-bottom: 12px !important;
   }
 
-  /* Push Orbital Overpass Fact to next fold/scroll */
+  /* Push Orbital Overpass Fact below the initial fold on larger screens */
   .overpass-fact-card {
-    margin-top: 28px !important;
+    margin-top: clamp(96px, 16vh, 180px) !important;
   }
 }
 

@@ -447,7 +447,7 @@ export const IssContentSections: React.FC<IssContentSectionsProps> = ({
               </div>
               <div className="overpass-fact-title-container">
                 <div className="info-card-label overpass-fact-label">
-                  ORBITAL OVERPASS FACT — {locationFact.title.toUpperCase()}
+                  OVERPASS BRIEF // {locationFact.title.toUpperCase()}
                 </div>
               </div>
             </div>

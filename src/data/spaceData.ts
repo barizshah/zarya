@@ -26,6 +26,7 @@ export interface SpaceAgency {
 
 export interface LocationFact {
   region: string;
+  keywords?: string[];
   title: string;
   fact: string;
   highlightMetric: string;
@@ -334,6 +335,90 @@ export const LOCATION_FACTS: LocationFact[] = [
     highlightMetric: '92.68 minute orbital period',
   },
   {
+    region: 'Arctic',
+    keywords: ['Arctic Ocean', 'Svalbard', 'Greenland'],
+    title: 'High-Latitude Polar Limits',
+    fact: 'Because the ISS orbits at a 51.6° inclination, it never flies directly over the poles, instead skimming the Arctic Circle where crews capture sweeping oblique views of sea ice and the Aurora Borealis.',
+    highlightMetric: '51.6° orbital inclination',
+  },
+  {
+    region: 'Southern',
+    keywords: ['Southern Ocean', 'Antarctica'],
+    title: 'Antarctic Circumpolar Current',
+    fact: 'Passing near the Southern Ocean, astronauts observe the planet’s strongest ocean current encircling Antarctica, alongside shimmering curtains of the Aurora Australis during southern hemisphere nights.',
+    highlightMetric: '60°S+ auroral viewing zone',
+  },
+  {
+    region: 'Australia',
+    keywords: ['New Zealand', 'Oceania', 'Tasman', 'Coral Sea'],
+    title: 'The Red Outback & Great Barrier Reef',
+    fact: 'Australia’s iron-rich red desert interior and the turquoise coral networks of the Great Barrier Reef are among the most vivid color contrasts visible from low Earth orbit.',
+    highlightMetric: '2,300 km reef system visible from orbit',
+  },
+  {
+    region: 'Mediterranean',
+    keywords: ['Italy', 'Greece', 'Spain', 'Egypt', 'Nile'],
+    title: 'The Nile Delta & Cradle of Civilization',
+    fact: 'At night, the Nile River and its fan-shaped delta glow like a golden ribbon cutting through the dark Sahara, guiding astronauts across the Mediterranean basin.',
+    highlightMetric: '1,600+ km illuminated river corridor',
+  },
+  {
+    region: 'Japan',
+    keywords: ['China', 'Korea', 'Tokyo', 'Beijing', 'East Asia'],
+    title: 'The Pacific Ring of Fire',
+    fact: 'Crossing East Asia, the ISS passes over volcanic island arcs, Mount Fuji’s symmetrical cone, and some of the brightest megalopolis light clusters on Earth.',
+    highlightMetric: '7.66 km/s ground track speed',
+  },
+  {
+    region: 'Russia',
+    keywords: ['Siberia', 'Kazakhstan', 'Baikonur'],
+    title: 'Baikonur Cosmodrome & Lake Baikal',
+    fact: 'Flying over Kazakhstan and Siberia, the station passes near Baikonur Cosmodrome—where the Zarya module and Soyuz crews launch—and Lake Baikal, Earth’s deepest freshwater lake.',
+    highlightMetric: '1,642 m deep ancient rift lake',
+  },
+  {
+    region: 'Middle East',
+    keywords: ['Saudi', 'Arabia', 'UAE', 'Red Sea', 'Persian Gulf', 'Oman'],
+    title: 'The Empty Quarter & Red Sea Rift',
+    fact: 'Astronauts photograph towering star dunes in the Rub’ al Khali desert and the tectonic Red Sea rift separating Africa from the Arabian Peninsula.',
+    highlightMetric: '650,000 km² sand sea',
+  },
+  {
+    region: 'India',
+    keywords: ['Bay of Bengal', 'Arabian Sea', 'Sri Lanka'],
+    title: 'The Ganges Delta & Monsoon Winds',
+    fact: 'From orbit, the braided sediment plumes of the Ganges-Brahmaputra delta stand out clearly where Himalayan meltwater meets the Bay of Bengal.',
+    highlightMetric: '105,000 km² river delta',
+  },
+  {
+    region: 'North America',
+    keywords: ['United States', 'USA', 'Canada', 'Mexico', 'Over US', 'Over CA'],
+    title: 'Great Lakes & Continental Grid',
+    fact: 'From 420 km up, the five Great Lakes gleam like inland seas by day, while interstate highways trace glowing geometric webs across the North American plains at night.',
+    highlightMetric: '244,106 km² freshwater basin',
+  },
+  {
+    region: 'South America',
+    keywords: ['Brazil', 'Argentina', 'Chile', 'Peru', 'Andes', 'Patagonia'],
+    title: 'Andes Cordillera & Patagonian Ice',
+    fact: 'The snow-crowned Andes spine casts long shadows across the Atacama Desert and Patagonian fjords, creating sharp weather divides visible on 4K orbital passes.',
+    highlightMetric: '7,000 km mountain chain',
+  },
+  {
+    region: 'Caribbean',
+    keywords: ['Gulf of Mexico', 'Bahamas', 'Cuba', 'Florida'],
+    title: 'Bahamas Carbonate Sandbanks',
+    fact: 'Astronauts often call the Bahamas one of the most recognizable sights from space, where shallow turquoise carbonate banks glow against the deep cobalt Atlantic.',
+    highlightMetric: '100,000+ km² shallow reefs',
+  },
+  {
+    region: 'Southeast Asia',
+    keywords: ['Indonesia', 'Philippines', 'Vietnam', 'Thailand', 'Malaysia', 'Borneo'],
+    title: 'Tropical Archipelago & Storm Towers',
+    fact: 'Over the Maritime Continent, towering cumulonimbus anvil clouds and volcanic island chains punctuate the turquoise waters between the Indian and Pacific Oceans.',
+    highlightMetric: '17,000+ islands in the arc',
+  },
+  {
     region: 'Default',
     title: 'Low Earth Orbit Microgravity',
     fact: "At an altitude of 420 km, Earth's gravity is still 90% as strong as on the surface. The ISS stays weightless because it is in perpetual free fall around Earth at orbital velocity (~27,600 km/h).",
@@ -344,7 +429,11 @@ export const LOCATION_FACTS: LocationFact[] = [
 export function getFactForLocation(locationName: string): LocationFact {
   const lower = locationName.toLowerCase();
   for (const item of LOCATION_FACTS) {
+    if (item.region === 'Default') continue;
     if (lower.includes(item.region.toLowerCase())) {
+      return item;
+    }
+    if (item.keywords?.some((kw) => lower.includes(kw.toLowerCase()))) {
       return item;
     }
   }
